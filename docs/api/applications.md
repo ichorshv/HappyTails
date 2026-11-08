@@ -59,3 +59,82 @@ All errors in the project are returned in the same format:
 | `422 Unprocessable Entity` | The address is too far and not in an allowed municipality | `TOO_FAR` |
 
 The queue position is not returned here – it comes from the queue module (Member 4).
+
+## 2. View an application (staff)
+
+`GET /api/admin/applications/{id}` · role: **STAFF**, **ADMIN**
+
+### Response `200 OK`
+
+```json
+{
+  "id": 15,
+  "applicant": { "id": 7, "fullName": "Мария Иванова", "email": "maria@example.com" },
+  "animal": { "id": 12, "name": "Рекс" },
+  "status": "WAITING",
+  "submittedAt": "2026-11-12T10:15:00Z",
+  "answers": {
+    "housingType": "HOUSE",
+    "hasYard": true,
+    "hasChildrenUnder6": false,
+    "hasCats": false,
+    "hasDogs": true,
+    "hasExperience": true,
+    "hoursAlonePerDay": 4,
+    "motivation": "Искаме куче, което да ни придружава на разходки."
+  },
+  "address": { "street": "ул. Витоша 10", "city": "София", "municipality": "Столична" },
+  "distanceKm": 12.4,
+  "rejectionReason": null
+}
+```
+
+| Status | When | Code |
+| --- | --- | --- |
+| `401` / `403` | Not logged in / not staff | `UNAUTHORIZED` / `FORBIDDEN` |
+| `404` | The application does not exist | `APPLICATION_NOT_FOUND` |
+
+## 3. Distance settings
+
+`GET /api/admin/geo-settings` and `PUT /api/admin/geo-settings` · role: **ADMIN**
+
+```json
+{
+  "shelterLat": 42.6977,
+  "shelterLon": 23.3219,
+  "maxDistanceKm": 50,
+  "allowedMunicipalities": ["Столична", "Божурище"]
+}
+```
+
+| Status | When | Code |
+| --- | --- | --- |
+| `200 OK` | Read / saved | – |
+| `400` | Invalid values (e.g. negative distance) | `VALIDATION_ERROR` |
+| `401` / `403` | Not logged in / not admin | `UNAUTHORIZED` / `FORBIDDEN` |
+
+## 4. Map of adopted animals (sprint 5)
+
+`GET /api/admin/adopted-map` · role: **STAFF**, **ADMIN**
+
+```json
+[
+  { "animalId": 3, "animalName": "Бети", "lat": 42.70, "lon": 23.32 }
+]
+```
+
+Coordinates are rounded to 2 decimal places (about 1 km), so the adopter's exact address is not shown.
+
+## To be agreed
+
+**With Member 2 – animal requirements.** Each requirement is checked against exactly one questionnaire answer:
+
+| Animal requirement | Meaning | Checked with |
+| --- | --- | --- |
+| `YARD` | needs a yard | `hasYard` |
+| `NO_CATS` | does not get along with cats | `hasCats` |
+| `NO_DOGS` | does not get along with dogs | `hasDogs` |
+| `NO_SMALL_CHILDREN` | not suitable for children under 6 | `hasChildrenUnder6` |
+| `EXPERIENCE` | requires an experienced owner | `hasExperience` |
+
+**With Member 4 – queue position.** Proposal: the applicant gets status and position from `GET /api/applications/my` (queue module).
