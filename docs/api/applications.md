@@ -61,12 +61,16 @@ All errors in the project are returned in the same format:
 | `409 Conflict`             | There is already an active application for the same animal                | `APPLICATION_DUPLICATE`                                                    |
 | `422 Unprocessable Entity` | The applicant already has 3 active applications                           | `APPLICATION_LIMIT_REACHED`                                                |
 | `422 Unprocessable Entity` | An answer conflicts with an animal requirement                            | `REQUIREMENT_NOT_MET`                                                      |
+| `422 Unprocessable Entity` | The address could not be found on the map                                 | `ADDRESS_NOT_FOUND`                                                        |
 | `422 Unprocessable Entity` | The address is too far and not in an allowed municipality                 | `TOO_FAR`                                                                  |
 
 The queue position is not returned here – it comes from the queue module (Member 4).
 
 Missing fields are all returned together in `details` (400). Business rules are checked in this order and only the first
 failed rule is returned: duplicate → limit of 3 → animal requirements → distance.
+
+If an application was accepted with `202` and the later address check fails, the application becomes `REJECTED` and the
+applicant is notified by email.
 
 ## 2. View an application (staff)
 
