@@ -6,10 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/**
- * Temporary stub: only writes to the log instead of sending an email.
- * It is replaced by the real Brevo adapter later.
- */
+
 @Service
 public class LoggingNotificationService implements NotificationService {
 
