@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WalkRepository extends JpaRepository<Walk, Long> {
 
-    List<Walk> findByApplicantIdAndStatusOrderByStartsAt(Long applicantId, WalkStatus status);
+  List<Walk> findByApplicantIdAndStatusOrderByStartsAt(Long applicantId, WalkStatus status);
 
-    List<Walk> findByStartsAtGreaterThanEqualAndStartsAtLessThanAndStatusOrderByStartsAt(
-            Instant from, Instant to, WalkStatus status);
+  List<Walk> findByStartsAtGreaterThanEqualAndStartsAtLessThanAndStatusOrderByStartsAt(
+      Instant from, Instant to, WalkStatus status);
 }
