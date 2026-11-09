@@ -4,5 +4,5 @@ import java.util.Optional;
 
 public interface GeocodingService {
 
-    Optional<Coordinates> geocode(String address);
+  Optional<Coordinates> geocode(String address);
 }
