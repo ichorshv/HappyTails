@@ -4,25 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 
 public class FakeGeocodingServiceTest {
 
-    private final FakeGeocodingService service = new FakeGeocodingService();
+  private final FakeGeocodingService service = new FakeGeocodingService();
 
-    @Test
-    void returnsFixedCoordinatesForAnyAddress() {
-        Optional<Coordinates> result = service.geocode("ул. Витоша 1, София");
+  @Test
+  void returnsFixedCoordinatesForAnyAddress() {
+    Optional<Coordinates> result = service.geocode("ул. Витоша 1, София");
 
-        assertTrue(result.isPresent());
-        assertEquals(new Coordinates(42.6977, 23.3219), result.get());
-    }
+    assertTrue(result.isPresent());
+    assertEquals(new Coordinates(42.6977, 23.3219), result.get());
+  }
 
-    @Test
-    void returnsEmptyForBlankAddress() {
-        Optional<Coordinates> result = service.geocode("");
+  @Test
+  void returnsEmptyForBlankAddress() {
+    Optional<Coordinates> result = service.geocode("");
 
-        assertTrue(result.isEmpty());
-    }
+    assertTrue(result.isEmpty());
+  }
 }

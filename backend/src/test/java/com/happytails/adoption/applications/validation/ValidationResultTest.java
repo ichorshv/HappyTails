@@ -9,23 +9,22 @@ import org.junit.jupiter.api.Test;
 
 public class ValidationResultTest {
 
-    @Test
-    void passMeansNoError() {
-        ValidationResult result = ValidationResult.pass();
+  @Test
+  void passMeansNoError() {
+    ValidationResult result = ValidationResult.pass();
 
-        assertTrue(result.passed());
-        assertNull(result.code());
-        assertNull(result.message());
-    }
+    assertTrue(result.passed());
+    assertNull(result.code());
+    assertNull(result.message());
+  }
 
-    @Test
-    void failKeepsCodeAndExplanation() {
-        ValidationResult result = ValidationResult.fail("REQUIREMENT_NOT_MET", "Животното има нужда от двор.");
+  @Test
+  void failKeepsCodeAndExplanation() {
+    ValidationResult result =
+        ValidationResult.fail("REQUIREMENT_NOT_MET", "Животното има нужда от двор.");
 
-        assertFalse(result.passed());
-        assertEquals("REQUIREMENT_NOT_MET", result.code());
-        assertEquals("Животното има нужда от двор.", result.message());
-
-
-    }
+    assertFalse(result.passed());
+    assertEquals("REQUIREMENT_NOT_MET", result.code());
+    assertEquals("Животното има нужда от двор.", result.message());
+  }
 }
