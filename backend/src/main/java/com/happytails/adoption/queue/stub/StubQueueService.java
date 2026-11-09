@@ -1,4 +1,3 @@
-
 package com.happytails.adoption.queue.stub;
 
 import com.happytails.adoption.queue.api.QueueService;
@@ -9,18 +8,18 @@ import org.springframework.stereotype.Service;
 @Profile("stub")
 public class StubQueueService implements QueueService {
 
-    @Override
-    public boolean isFirstInQueue(Long applicationId) {
-        return true;
-    }
+  @Override
+  public boolean isFirstInQueue(Long applicationId) {
+    return true;
+  }
 
-    @Override
-    public int getQueuePosition(Long applicationId) {
-        return 1;
-    }
+  @Override
+  public int getQueuePosition(Long applicationId) {
+    return 1;
+  }
 
-    @Override
-    public void markWalkScheduled(Long applicationId) {
-        // TODO: Implement actual queue logic in Sprint 2.
-    }
+  @Override
+  public void markWalkScheduled(Long applicationId) {
+    // TODO: Implement actual queue logic in Sprint 2.
+  }
 }
