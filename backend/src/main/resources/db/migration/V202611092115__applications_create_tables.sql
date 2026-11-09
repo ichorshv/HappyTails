@@ -11,7 +11,9 @@ CREATE TABLE applications
     longitude        DOUBLE PRECISION,
     distance_km      DOUBLE PRECISION,
     rejection_reason VARCHAR(500),
-    submitted_at     TIMESTAMP WITH TIME ZONE NOT NULL
+    submitted_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    turn_deadline    TIMESTAMP WITH TIME ZONE,
+    version          BIGINT                   NOT NULL DEFAULT 0
 );
 
 CREATE TABLE application_answers
