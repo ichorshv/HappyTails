@@ -1,6 +1,6 @@
-package bg.adoption.notifications.service;
+package com.happytails.adoption.notifications.service;
 
-import bg.adoption.notifications.api.NotificationService;
+import com.happytails.adoption.notifications.api.NotificationService;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
