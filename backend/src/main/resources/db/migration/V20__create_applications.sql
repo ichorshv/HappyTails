@@ -27,3 +27,9 @@ CREATE TABLE application_answers
     hours_alone_per_day INTEGER     NOT NULL CHECK (hours_alone_per_day BETWEEN 0 AND 24),
     motivation          TEXT        NOT NULL
 );
+
+CREATE UNIQUE INDEX uq_applications_active_per_animal
+    ON applications (applicant_id, animal_id) WHERE status IN ('SUBMITTED', 'WAITING', 'YOUR_TURN', 'WALK_SCHEDULED', 'APPROVED');
+
+CREATE INDEX idx_applications_animal_queue
+    ON applications (animal_id, status, submitted_at);
