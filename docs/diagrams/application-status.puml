@@ -1,0 +1,60 @@
+
+@startuml
+title HappyTails - Application Status Diagram
+
+hide empty description
+
+[*] --> SUBMITTED : Applicant submits application
+
+SUBMITTED --> WAITING : Valid / others ahead
+SUBMITTED --> YOUR_TURN : Valid / first in queue
+SUBMITTED --> REJECTED : Validation failed
+
+WAITING --> YOUR_TURN : Previous applicants removed
+WAITING --> WITHDRAWN : Applicant withdraws
+WAITING --> REJECTED : Staff rejects / animal adopted
+
+YOUR_TURN --> WALK_SCHEDULED : Applicant books walk
+YOUR_TURN --> EXPIRED : 48h deadline expired
+YOUR_TURN --> WITHDRAWN : Applicant withdraws
+YOUR_TURN --> REJECTED : Staff rejects
+
+WALK_SCHEDULED --> APPROVED : Staff approves
+WALK_SCHEDULED --> REJECTED : Staff rejects
+WALK_SCHEDULED --> WITHDRAWN : Applicant withdraws
+
+WALK_SCHEDULED --> YOUR_TURN : Cancel walk [before deadline]
+
+APPROVED --> COMPLETED : Animal handed over
+APPROVED --> WITHDRAWN : Approved applicant withdraws
+note right of APPROVED
+  If an approved applicant withdraws:
+  - Application becomes WITHDRAWN.
+  - Animal becomes AVAILABLE again.
+  - Next applicant becomes YOUR_TURN.
+  - A new 48h deadline starts.
+end note
+
+COMPLETED --> [*]
+REJECTED --> [*]
+WITHDRAWN --> [*]
+EXPIRED --> [*]
+
+note right of WAITING
+  When an application is APPROVED:
+  - Other applicants remain WAITING.
+  - If adoption fails, the queue continues.
+  - When adoption is COMPLETED,
+    remaining applications become REJECTED.
+  - Rejection reason:
+    "Animal adopted by another applicant."
+end note
+
+note right of YOUR_TURN
+  When a walk is cancelled:
+  - Applicant returns to YOUR_TURN.
+  - Original 48h deadline is preserved.
+  - Deadline is NOT restarted.
+end note
+
+@enduml
