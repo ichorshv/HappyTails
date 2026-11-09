@@ -1,0 +1,10 @@
+package com.happytails.adoption.applications.repository;
+
+import com.happytails.adoption.applications.domain.ApplicationAnswers;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ApplicationAnswersRepository extends JpaRepository<ApplicationAnswers, Long> {
+
+  Optional<ApplicationAnswers> findByApplicationId(Long applicationId);
+}
