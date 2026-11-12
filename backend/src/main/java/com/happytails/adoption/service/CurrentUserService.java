@@ -1,4 +1,6 @@
-package com.happytails.adoption.users.api;
+package com.happytails.adoption.service;
+
+import com.happytails.adoption.enums.Role;
 
 public interface CurrentUserService {
 

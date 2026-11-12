@@ -1,7 +1,6 @@
-package com.happytails.adoption.users.service;
+package com.happytails.adoption.service;
 
-import com.happytails.adoption.users.api.CurrentUserService;
-import com.happytails.adoption.users.api.Role;
+import com.happytails.adoption.enums.Role;
 import org.springframework.stereotype.Service;
 
 /** Temporary implementation until real authentication is added (issue #20). */
