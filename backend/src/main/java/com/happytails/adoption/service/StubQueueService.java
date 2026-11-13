@@ -1,6 +1,5 @@
-package com.happytails.adoption.queue.stub;
+package com.happytails.adoption.service;
 
-import com.happytails.adoption.queue.api.QueueService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 

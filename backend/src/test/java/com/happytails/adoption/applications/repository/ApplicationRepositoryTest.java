@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.happytails.adoption.applications.domain.Application;
 import com.happytails.adoption.applications.domain.ApplicationAnswers;
 import com.happytails.adoption.applications.dto.HousingType;
-import com.happytails.adoption.queue.api.ApplicationStatus;
+import com.happytails.adoption.enums.ApplicationStatus;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
