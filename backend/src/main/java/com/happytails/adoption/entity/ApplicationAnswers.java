@@ -1,6 +1,6 @@
-package com.happytails.adoption.applications.domain;
+package com.happytails.adoption.entity;
 
-import com.happytails.adoption.applications.dto.HousingType;
+import com.happytails.adoption.enums.HousingType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

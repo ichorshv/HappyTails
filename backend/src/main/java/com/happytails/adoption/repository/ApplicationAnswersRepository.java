@@ -1,6 +1,6 @@
-package com.happytails.adoption.applications.repository;
+package com.happytails.adoption.repository;
 
-import com.happytails.adoption.applications.domain.ApplicationAnswers;
+import com.happytails.adoption.entity.ApplicationAnswers;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

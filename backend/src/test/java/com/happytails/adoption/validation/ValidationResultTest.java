@@ -1,4 +1,4 @@
-package com.happytails.adoption.applications.validation;
+package com.happytails.adoption.validation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

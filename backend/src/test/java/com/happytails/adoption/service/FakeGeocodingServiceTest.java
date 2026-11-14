@@ -1,8 +1,9 @@
-package com.happytails.adoption.geo;
+package com.happytails.adoption.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.happytails.adoption.dto.Coordinates;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 

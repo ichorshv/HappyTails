@@ -1,4 +1,4 @@
-package com.happytails.adoption.geo;
+package com.happytails.adoption.exception;
 
 public class GeocodingUnavailableException extends RuntimeException {
 
