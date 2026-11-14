@@ -1,5 +1,6 @@
-package com.happytails.adoption.applications.dto;
+package com.happytails.adoption.dto;
 
+import com.happytails.adoption.enums.HousingType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

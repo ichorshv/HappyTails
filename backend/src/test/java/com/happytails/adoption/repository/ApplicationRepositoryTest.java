@@ -1,4 +1,4 @@
-package com.happytails.adoption.applications.repository;
+package com.happytails.adoption.repository;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.happytails.adoption.applications.domain.Application;
-import com.happytails.adoption.applications.domain.ApplicationAnswers;
-import com.happytails.adoption.applications.dto.HousingType;
-import com.happytails.adoption.queue.api.ApplicationStatus;
+import com.happytails.adoption.entity.Application;
+import com.happytails.adoption.entity.ApplicationAnswers;
+import com.happytails.adoption.enums.ApplicationStatus;
+import com.happytails.adoption.enums.HousingType;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

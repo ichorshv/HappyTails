@@ -1,4 +1,4 @@
-package com.happytails.adoption.applications.dto;
+package com.happytails.adoption.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
