@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.happytails.adoption.dto.ApplicationAddress;
 import com.happytails.adoption.dto.ApplicationRequest;
-import com.happytails.adoption.enums.HousingType;
 import com.happytails.adoption.dto.QuestionnaireAnswers;
+import com.happytails.adoption.enums.HousingType;
 import org.junit.jupiter.api.Test;
 
 public class ValidationRuleTest {

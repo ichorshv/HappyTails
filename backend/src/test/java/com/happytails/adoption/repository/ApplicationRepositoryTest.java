@@ -8,10 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.entity.ApplicationAnswers;
-import com.happytails.adoption.enums.HousingType;
 import com.happytails.adoption.enums.ApplicationStatus;
+import com.happytails.adoption.enums.HousingType;
 import java.time.Instant;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
