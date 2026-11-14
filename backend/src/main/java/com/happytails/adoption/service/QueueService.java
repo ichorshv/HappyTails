@@ -1,4 +1,4 @@
-package com.happytails.adoption.queue.api;
+package com.happytails.adoption.service;
 
 public interface QueueService {
 

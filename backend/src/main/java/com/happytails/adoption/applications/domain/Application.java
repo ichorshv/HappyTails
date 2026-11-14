@@ -1,6 +1,6 @@
 package com.happytails.adoption.applications.domain;
 
-import com.happytails.adoption.queue.api.ApplicationStatus;
+import com.happytails.adoption.enums.ApplicationStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
