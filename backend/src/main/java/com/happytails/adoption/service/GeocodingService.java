@@ -1,4 +1,6 @@
-package com.happytails.adoption.geo;
+package com.happytails.adoption.service;
+
+import com.happytails.adoption.dto.Coordinates;
 
 import java.util.Optional;
 

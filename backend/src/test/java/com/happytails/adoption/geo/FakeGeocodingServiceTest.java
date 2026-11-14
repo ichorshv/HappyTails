@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
+
+import com.happytails.adoption.dto.Coordinates;
+import com.happytails.adoption.service.FakeGeocodingService;
 import org.junit.jupiter.api.Test;
 
 public class FakeGeocodingServiceTest {

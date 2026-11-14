@@ -1,6 +1,8 @@
-package com.happytails.adoption.geo;
+package com.happytails.adoption.service;
 
 import java.util.Optional;
+
+import com.happytails.adoption.dto.Coordinates;
 import org.springframework.stereotype.Service;
 
 @Service
