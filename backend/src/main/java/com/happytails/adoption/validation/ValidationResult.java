@@ -1,4 +1,4 @@
-package com.happytails.adoption.applications.validation;
+package com.happytails.adoption.validation;
 
 public record ValidationResult(boolean passed, String code, String message) {
 

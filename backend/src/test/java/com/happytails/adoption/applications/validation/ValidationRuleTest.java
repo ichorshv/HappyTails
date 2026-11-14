@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.happytails.adoption.applications.dto.ApplicationAddress;
-import com.happytails.adoption.applications.dto.ApplicationRequest;
-import com.happytails.adoption.applications.dto.HousingType;
-import com.happytails.adoption.applications.dto.QuestionnaireAnswers;
+import com.happytails.adoption.dto.ApplicationAddress;
+import com.happytails.adoption.dto.ApplicationRequest;
+import com.happytails.adoption.enums.HousingType;
+import com.happytails.adoption.dto.QuestionnaireAnswers;
+import com.happytails.adoption.validation.ValidationResult;
+import com.happytails.adoption.validation.ValidationRule;
 import org.junit.jupiter.api.Test;
 
 public class ValidationRuleTest {

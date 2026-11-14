@@ -1,4 +1,4 @@
-package com.happytails.adoption.applications.dto;
+package com.happytails.adoption.enums;
 
 public enum HousingType {
   APARTMENT,

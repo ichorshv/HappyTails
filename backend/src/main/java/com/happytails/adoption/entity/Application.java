@@ -1,4 +1,4 @@
-package com.happytails.adoption.applications.domain;
+package com.happytails.adoption.entity;
 
 import com.happytails.adoption.enums.ApplicationStatus;
 import jakarta.persistence.Column;

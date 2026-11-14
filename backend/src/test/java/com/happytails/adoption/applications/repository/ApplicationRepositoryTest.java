@@ -6,11 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.happytails.adoption.applications.domain.Application;
-import com.happytails.adoption.applications.domain.ApplicationAnswers;
-import com.happytails.adoption.applications.dto.HousingType;
+import com.happytails.adoption.entity.Application;
+import com.happytails.adoption.entity.ApplicationAnswers;
+import com.happytails.adoption.enums.HousingType;
 import com.happytails.adoption.enums.ApplicationStatus;
 import java.time.Instant;
+
+import com.happytails.adoption.repository.ApplicationAnswersRepository;
+import com.happytails.adoption.repository.ApplicationRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
