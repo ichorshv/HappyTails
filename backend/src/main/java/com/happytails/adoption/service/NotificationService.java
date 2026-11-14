@@ -1,4 +1,4 @@
-package com.happytails.adoption.notifications.api;
+package com.happytails.adoption.service;
 
 import java.util.Map;
 
