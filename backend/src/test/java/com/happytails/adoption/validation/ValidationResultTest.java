@@ -1,11 +1,10 @@
-package com.happytails.adoption.applications.validation;
+package com.happytails.adoption.validation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.happytails.adoption.validation.ValidationResult;
 import org.junit.jupiter.api.Test;
 
 public class ValidationResultTest {

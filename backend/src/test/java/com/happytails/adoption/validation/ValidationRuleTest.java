@@ -1,4 +1,4 @@
-package com.happytails.adoption.applications.validation;
+package com.happytails.adoption.validation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,8 +8,6 @@ import com.happytails.adoption.dto.ApplicationAddress;
 import com.happytails.adoption.dto.ApplicationRequest;
 import com.happytails.adoption.enums.HousingType;
 import com.happytails.adoption.dto.QuestionnaireAnswers;
-import com.happytails.adoption.validation.ValidationResult;
-import com.happytails.adoption.validation.ValidationRule;
 import org.junit.jupiter.api.Test;
 
 public class ValidationRuleTest {
