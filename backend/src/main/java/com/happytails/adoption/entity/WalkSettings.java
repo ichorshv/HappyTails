@@ -1,4 +1,4 @@
-package com.happytails.adoption.walks.domain;
+package com.happytails.adoption.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

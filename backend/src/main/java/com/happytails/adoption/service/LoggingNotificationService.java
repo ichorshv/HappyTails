@@ -1,6 +1,5 @@
-package com.happytails.adoption.notifications.service;
+package com.happytails.adoption.service;
 
-import com.happytails.adoption.notifications.api.NotificationService;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,5 +1,6 @@
-package com.happytails.adoption.walks.domain;
+package com.happytails.adoption.entity;
 
+import com.happytails.adoption.enums.WalkStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

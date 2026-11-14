@@ -1,7 +1,7 @@
-package com.happytails.adoption.walks.repository;
+package com.happytails.adoption.repository;
 
-import com.happytails.adoption.walks.domain.Walk;
-import com.happytails.adoption.walks.domain.WalkStatus;
+import com.happytails.adoption.entity.Walk;
+import com.happytails.adoption.enums.WalkStatus;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

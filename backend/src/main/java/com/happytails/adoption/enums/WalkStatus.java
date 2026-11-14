@@ -1,4 +1,4 @@
-package com.happytails.adoption.walks.domain;
+package com.happytails.adoption.enums;
 
 public enum WalkStatus {
   BOOKED,
