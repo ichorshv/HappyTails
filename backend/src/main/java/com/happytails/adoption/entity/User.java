@@ -73,6 +73,10 @@ public class User {
     return active;
   }
 
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
   public Instant getCreatedAt() {
     return createdAt;
   }

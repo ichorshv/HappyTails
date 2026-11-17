@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +40,10 @@ class AuthControllerTest {
         """
             .formatted(email, password, fullName);
     return mockMvc.perform(
-        post("/api/auth/register").contentType(MediaType.APPLICATION_JSON).content(body));
+        post("/api/auth/register")
+            .with(csrf())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(body));
   }
 
   @Test

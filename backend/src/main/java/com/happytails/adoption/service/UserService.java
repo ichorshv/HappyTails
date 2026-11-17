@@ -1,5 +1,7 @@
 package com.happytails.adoption.service;
 
+import com.happytails.adoption.dto.AuthUser;
+import com.happytails.adoption.dto.LoginRequest;
 import com.happytails.adoption.dto.RegisterRequest;
 import com.happytails.adoption.dto.UserResponse;
 import com.happytails.adoption.entity.User;
@@ -26,10 +28,14 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final Clock clock;
 
+  /** Checked when the email is unknown, so the answer takes as long as for a real user. */
+  private final String dummyHash;
+
   public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Clock clock) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.clock = clock;
+    this.dummyHash = passwordEncoder.encode("dummy-password-1");
   }
 
   @Transactional
@@ -57,8 +63,52 @@ public class UserService {
     }
   }
 
+  /**
+   * Checks the email and password. The error does not say which of the two is wrong. The password
+   * is checked before the active flag, so only the owner can learn that an account is disabled.
+   */
+  @Transactional(readOnly = true)
+  public AuthUser authenticate(LoginRequest request) {
+    User user = userRepository.findByEmail(normalizeEmail(request.email())).orElse(null);
+    String hash = user != null ? user.getPasswordHash() : dummyHash;
+    boolean passwordMatches = passwordEncoder.matches(request.password(), hash);
+    if (user == null || !passwordMatches) {
+      throw new ApiException(
+          HttpStatus.UNAUTHORIZED, "AUTH_BAD_CREDENTIALS", "Грешен имейл или парола.");
+    }
+    if (!user.isActive()) {
+      throw new ApiException(
+          HttpStatus.FORBIDDEN, "AUTH_ACCOUNT_DISABLED", "Профилът е деактивиран.");
+    }
+    return toAuthUser(user);
+  }
+
+  @Transactional(readOnly = true)
+  public UserResponse getUser(Long id) {
+    return userRepository
+        .findById(id)
+        .map(UserMapper::toResponse)
+        .orElseThrow(() -> unauthorized());
+  }
+
+  @Transactional(readOnly = true)
+  public AuthUser getAuthUserByEmail(String email) {
+    return userRepository
+        .findByEmail(normalizeEmail(email))
+        .map(UserService::toAuthUser)
+        .orElseThrow(() -> unauthorized());
+  }
+
+  public static AuthUser toAuthUser(User user) {
+    return new AuthUser(user.getId(), user.getEmail(), user.getRole());
+  }
+
   public static String normalizeEmail(String email) {
     return email.strip().toLowerCase(Locale.ROOT);
+  }
+
+  private static ApiException unauthorized() {
+    return new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Не сте влезли в профила си.");
   }
 
   private static ApiException emailTaken() {
