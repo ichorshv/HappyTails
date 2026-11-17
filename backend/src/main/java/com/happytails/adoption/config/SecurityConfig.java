@@ -41,6 +41,8 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/auth/**")
                     .authenticated()
+                    .requestMatchers("/api/admin/**")
+                    .hasAnyRole("STAFF", "ADMIN")
                     // Other endpoints get their access rules in issue #33.
                     .anyRequest()
                     .permitAll());
