@@ -1,9 +1,21 @@
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
 
   --color-brand-50: #fff7ed;
   --color-brand-100: #ffedd5;
   --color-brand-500: #f97316;
   --color-brand-600: #ea580c;
   --color-brand-700: #c2410c;
+
+  /* Colors from the Figma auth screens */
+  --color-ink: #23393f;
+  --color-page: #f8feff;
+  --color-glass: #edf9f8;
+  --color-mint: #ddf3eb;
+  --color-coral: #f06c6c;
+  --color-leaf: #3fa585;
+  --color-danger: #b82149;
+
+  --radius-pill: 54px;
+  --shadow-soft: 4px 4px 4px 0 rgb(0 0 0 / 0.25);
 }
