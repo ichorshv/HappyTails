@@ -43,6 +43,8 @@ public class SecurityConfig {
                     .authenticated()
                     .requestMatchers("/api/admin/**")
                     .hasAnyRole("STAFF", "ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/applications/*/status")
+                    .authenticated()
                     // Other endpoints get their access rules in issue #33.
                     .anyRequest()
                     .permitAll());
