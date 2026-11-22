@@ -18,5 +18,5 @@ public enum ApplicationStatus {
    * index uq_applications_active_per_animal in the applications migration.
    */
   public static final Set<ApplicationStatus> ACTIVE =
-          Set.of(SUBMITTED, WAITING, YOUR_TURN, WALK_SCHEDULED, APPROVED);
+      Set.of(SUBMITTED, WAITING, YOUR_TURN, WALK_SCHEDULED, APPROVED);
 }
