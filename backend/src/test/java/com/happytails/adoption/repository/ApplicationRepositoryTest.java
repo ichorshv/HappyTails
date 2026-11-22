@@ -75,6 +75,7 @@ class ApplicationRepositoryTest {
 
   @Test
   void ignoresInactiveApplicationsAndOtherAnimalsOrApplicants() {
+    saveWithStatus(1L, 9L, ApplicationStatus.WAITING);
     saveWithStatus(1L, 7L, ApplicationStatus.WITHDRAWN);
     saveWithStatus(2L, 8L, ApplicationStatus.WAITING);
 
@@ -84,6 +85,26 @@ class ApplicationRepositoryTest {
     assertFalse(
         applicationRepository.existsByApplicantIdAndAnimalIdAndStatusIn(
             1L, 8L, ApplicationStatus.ACTIVE));
+  }
+
+  @Test
+  void countsOnlyActiveApplicationsOfApplicant() {
+    saveWithStatus(1L, 7L, ApplicationStatus.SUBMITTED);
+    saveWithStatus(1L, 8L, ApplicationStatus.WAITING);
+    saveWithStatus(1L, 9L, ApplicationStatus.APPROVED);
+    saveWithStatus(1L, 10L, ApplicationStatus.REJECTED);
+
+    assertEquals(
+        3, applicationRepository.countByApplicantIdAndStatusIn(1L, ApplicationStatus.ACTIVE));
+  }
+
+  @Test
+  void doesNotCountApplicationsOfOtherApplicants() {
+    saveWithStatus(1L, 7L, ApplicationStatus.WAITING);
+    saveWithStatus(2L, 8L, ApplicationStatus.WAITING);
+
+    assertEquals(
+        1, applicationRepository.countByApplicantIdAndStatusIn(1L, ApplicationStatus.ACTIVE));
   }
 
   private Application saveWithStatus(Long applicantId, Long animalId, ApplicationStatus status) {
