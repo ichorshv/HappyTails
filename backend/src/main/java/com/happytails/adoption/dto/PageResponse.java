@@ -1,4 +1,4 @@
-package com.happytails.adoption.animals.dto;
+package com.happytails.adoption.dto;
 
 import java.util.List;
 

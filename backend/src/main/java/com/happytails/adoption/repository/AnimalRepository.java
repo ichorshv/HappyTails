@@ -1,7 +1,7 @@
-package com.happytails.adoption.animals.repository;
+package com.happytails.adoption.repository;
 
-import com.happytails.adoption.animals.api.AnimalStatus;
-import com.happytails.adoption.animals.domain.Animal;
+import com.happytails.adoption.entity.Animal;
+import com.happytails.adoption.enums.AnimalStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

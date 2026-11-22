@@ -1,7 +1,7 @@
-package com.happytails.adoption.animals.mapper;
+package com.happytails.adoption.mapper;
 
-import com.happytails.adoption.animals.domain.Animal;
-import com.happytails.adoption.animals.dto.AnimalSummaryResponse;
+import com.happytails.adoption.dto.AnimalSummaryResponse;
+import com.happytails.adoption.entity.Animal;
 import org.springframework.stereotype.Component;
 
 @Component

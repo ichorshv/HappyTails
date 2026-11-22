@@ -1,4 +1,4 @@
-package com.happytails.adoption.animals.api;
+package com.happytails.adoption.enums;
 
 public enum RequirementType {
   YARD,

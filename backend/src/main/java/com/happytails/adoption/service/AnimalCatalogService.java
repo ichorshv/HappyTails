@@ -1,11 +1,11 @@
-package com.happytails.adoption.animals.service;
+package com.happytails.adoption.service;
 
-import com.happytails.adoption.animals.api.AnimalStatus;
-import com.happytails.adoption.animals.domain.Animal;
-import com.happytails.adoption.animals.dto.AnimalSummaryResponse;
-import com.happytails.adoption.animals.dto.PageResponse;
-import com.happytails.adoption.animals.mapper.AnimalMapper;
-import com.happytails.adoption.animals.repository.AnimalRepository;
+import com.happytails.adoption.dto.AnimalSummaryResponse;
+import com.happytails.adoption.dto.PageResponse;
+import com.happytails.adoption.entity.Animal;
+import com.happytails.adoption.enums.AnimalStatus;
+import com.happytails.adoption.mapper.AnimalMapper;
+import com.happytails.adoption.repository.AnimalRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;

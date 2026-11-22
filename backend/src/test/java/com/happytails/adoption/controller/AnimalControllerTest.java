@@ -1,4 +1,4 @@
-package com.happytails.adoption.animals.web;
+package com.happytails.adoption.controller;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
