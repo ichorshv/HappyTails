@@ -7,12 +7,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.happytails.adoption.animals.repository.AnimalRepository;
 import com.happytails.adoption.dto.FreeSlotsResponse;
 import com.happytails.adoption.entity.Walk;
 import com.happytails.adoption.entity.WalkSettings;
 import com.happytails.adoption.enums.WalkStatus;
 import com.happytails.adoption.exception.ApiException;
+import com.happytails.adoption.repository.AnimalRepository;
 import com.happytails.adoption.repository.WalkRepository;
 import com.happytails.adoption.repository.WalkSettingsRepository;
 import java.time.Clock;

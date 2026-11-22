@@ -1,13 +1,13 @@
-package com.happytails.adoption.animals.repository;
+package com.happytails.adoption.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.happytails.adoption.animals.api.AnimalSize;
-import com.happytails.adoption.animals.api.AnimalStatus;
-import com.happytails.adoption.animals.api.RequirementType;
-import com.happytails.adoption.animals.api.Species;
-import com.happytails.adoption.animals.domain.Animal;
+import com.happytails.adoption.entity.Animal;
+import com.happytails.adoption.enums.AnimalSize;
+import com.happytails.adoption.enums.AnimalStatus;
+import com.happytails.adoption.enums.RequirementType;
+import com.happytails.adoption.enums.Species;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.EnumSet;
