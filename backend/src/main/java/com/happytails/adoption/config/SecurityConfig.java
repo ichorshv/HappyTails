@@ -35,19 +35,32 @@ public class SecurityConfig {
                 errors
                     .authenticationEntryPoint(JsonErrorHandlers.unauthorized())
                     .accessDeniedHandler(JsonErrorHandlers.forbidden()))
+        // Roles come from the contracts in docs/api. The first matching rule wins, so the more
+        // specific addresses come first. Anything not listed is closed.
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login")
+                auth.requestMatchers("/error")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login")
                     .permitAll()
                     .requestMatchers("/api/auth/**")
                     .authenticated()
-                    .requestMatchers("/api/admin/**")
+                    .requestMatchers(HttpMethod.GET, "/api/animals/**")
+                    .permitAll()
+                    .requestMatchers(
+                        "/api/admin/users/**",
+                        "/api/admin/walk-settings/**",
+                        "/api/admin/geo-settings/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/api/admin/**", "/api/staff/**")
                     .hasAnyRole("STAFF", "ADMIN")
+                    // Owner, staff and admin; the owner check is in the service.
                     .requestMatchers(HttpMethod.GET, "/api/applications/*/status")
                     .authenticated()
-                    // Other endpoints get their access rules in issue #33.
+                    .requestMatchers("/api/applications/**", "/api/walks/**")
+                    .hasRole("APPLICANT")
                     .anyRequest()
-                    .permitAll());
+                    .denyAll());
     return http.build();
   }
 
