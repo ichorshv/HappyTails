@@ -12,7 +12,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
       Long animalId, Collection<ApplicationStatus> statuses);
 
   boolean existsByApplicantIdAndAnimalIdAndStatusIn(
-          Long applicantId, Long animalId, Collection<ApplicationStatus> statuses);
+      Long applicantId, Long animalId, Collection<ApplicationStatus> statuses);
 
   long countByApplicantIdAndStatusIn(Long applicantId, Collection<ApplicationStatus> statuses);
 }
