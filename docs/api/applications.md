@@ -47,6 +47,7 @@ All errors in the project are returned in the same format:
 
 - `housingType`: `APARTMENT` | `HOUSE`
 - `hasCats` / `hasDogs` – whether cats / dogs already live in the home (regardless of which animal is being adopted).
+- `motivation`: required, up to 500 characters.
 
 ### Responses
 
