@@ -10,4 +10,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
   List<Application> findByAnimalIdAndStatusInOrderBySubmittedAtAscIdAsc(
       Long animalId, Collection<ApplicationStatus> statuses);
+
+  boolean existsByApplicantIdAndAnimalIdAndStatusIn(
+          Long applicantId, Long animalId, Collection<ApplicationStatus> statuses);
 }
