@@ -3,10 +3,12 @@ package com.happytails.adoption.validation;
 import com.happytails.adoption.dto.ApplicationRequest;
 import com.happytails.adoption.enums.ApplicationStatus;
 import com.happytails.adoption.repository.ApplicationRepository;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /** Rejects a new application when the applicant already has the maximum number of active ones. */
 @Component
+@Order(2)
 public class ApplicationLimitRule implements ValidationRule {
 
   private static final int MAX_ACTIVE_APPLICATIONS = 3;

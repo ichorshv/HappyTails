@@ -3,10 +3,12 @@ package com.happytails.adoption.validation;
 import com.happytails.adoption.dto.ApplicationRequest;
 import com.happytails.adoption.enums.ApplicationStatus;
 import com.happytails.adoption.repository.ApplicationRepository;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /** Rejects a second active application of the same applicant for the same animal. */
 @Component
+@Order(1)
 public class DuplicateApplicationRule implements ValidationRule {
 
   private final ApplicationRepository applicationRepository;
