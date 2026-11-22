@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -12,17 +13,21 @@ import com.happytails.adoption.dto.ApplicationAddress;
 import com.happytails.adoption.dto.ApplicationCreatedResponse;
 import com.happytails.adoption.dto.ApplicationRequest;
 import com.happytails.adoption.dto.QuestionnaireAnswers;
+import com.happytails.adoption.entity.Animal;
 import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.entity.ApplicationAnswers;
+import com.happytails.adoption.enums.AnimalStatus;
 import com.happytails.adoption.enums.ApplicationStatus;
 import com.happytails.adoption.enums.HousingType;
 import com.happytails.adoption.exception.ApiException;
+import com.happytails.adoption.repository.AnimalRepository;
 import com.happytails.adoption.repository.ApplicationAnswersRepository;
 import com.happytails.adoption.repository.ApplicationRepository;
 import com.happytails.adoption.validation.ValidationResult;
 import com.happytails.adoption.validation.ValidationRule;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +41,7 @@ class ApplicationSubmissionServiceTest {
 
   @Mock private ValidationRule firstRule;
   @Mock private ValidationRule secondRule;
+  @Mock private AnimalRepository animalRepository;
   @Mock private ApplicationRepository applicationRepository;
   @Mock private ApplicationAnswersRepository answersRepository;
   @Mock private StatusTransitionService statusTransitionService;
@@ -48,6 +54,7 @@ class ApplicationSubmissionServiceTest {
     service =
         new ApplicationSubmissionService(
             List.of(firstRule, secondRule),
+            animalRepository,
             applicationRepository,
             answersRepository,
             statusTransitionService,
@@ -57,6 +64,7 @@ class ApplicationSubmissionServiceTest {
 
   @Test
   void savesApplicationAndMovesItToWaitingWhenAllRulesPass() {
+    givenAvailableAnimal();
     when(firstRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
     when(secondRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
     when(applicationRepository.save(any(Application.class)))
@@ -73,6 +81,7 @@ class ApplicationSubmissionServiceTest {
 
   @Test
   void rejectsDuplicateWithConflictAndSavesNothing() {
+    givenAvailableAnimal();
     when(firstRule.validate(eq(1L), any()))
         .thenReturn(
             ValidationResult.fail(
@@ -87,6 +96,7 @@ class ApplicationSubmissionServiceTest {
 
   @Test
   void rejectsLimitReachedWithUnprocessableEntityAndSavesNothing() {
+    givenAvailableAnimal();
     when(firstRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
     when(secondRule.validate(eq(1L), any()))
         .thenReturn(
@@ -98,6 +108,40 @@ class ApplicationSubmissionServiceTest {
     assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatus());
     assertEquals("APPLICATION_LIMIT_REACHED", ex.getCode());
     verifyNoInteractions(applicationRepository, answersRepository);
+  }
+
+  @Test
+  void rejectsMissingAnimalWithNotFoundAndSavesNothing() {
+    when(animalRepository.findById(7L)).thenReturn(Optional.empty());
+
+    ApiException ex = assertThrows(ApiException.class, () -> service.submit(request()));
+
+    assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
+    assertEquals("ANIMAL_NOT_AVAILABLE", ex.getCode());
+    verifyNoInteractions(firstRule, secondRule, applicationRepository, answersRepository);
+  }
+
+  @Test
+  void rejectsAnimalThatIsNotAvailable() {
+    givenAnimalWithStatus(AnimalStatus.RESERVED);
+
+    ApiException ex = assertThrows(ApiException.class, () -> service.submit(request()));
+
+    assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
+    assertEquals("ANIMAL_NOT_AVAILABLE", ex.getCode());
+    verifyNoInteractions(firstRule, secondRule, applicationRepository, answersRepository);
+  }
+
+  private void givenAvailableAnimal() {
+    givenAnimalWithStatus(AnimalStatus.AVAILABLE);
+  }
+
+  // The mock is created and stubbed first, and only then handed to the repository stub.
+  // Nesting when(...) inside thenReturn(...) causes UnfinishedStubbingException.
+  private void givenAnimalWithStatus(AnimalStatus status) {
+    Animal animal = mock(Animal.class);
+    when(animal.getStatus()).thenReturn(status);
+    when(animalRepository.findById(7L)).thenReturn(Optional.of(animal));
   }
 
   private Application application(Long id, ApplicationStatus status) {

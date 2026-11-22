@@ -6,8 +6,10 @@ import com.happytails.adoption.dto.ApplicationRequest;
 import com.happytails.adoption.dto.QuestionnaireAnswers;
 import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.entity.ApplicationAnswers;
+import com.happytails.adoption.enums.AnimalStatus;
 import com.happytails.adoption.enums.ApplicationStatus;
 import com.happytails.adoption.exception.ApiException;
+import com.happytails.adoption.repository.AnimalRepository;
 import com.happytails.adoption.repository.ApplicationAnswersRepository;
 import com.happytails.adoption.repository.ApplicationRepository;
 import com.happytails.adoption.validation.ValidationResult;
@@ -28,6 +30,7 @@ public class ApplicationSubmissionService {
           "APPLICATION_LIMIT_REACHED", HttpStatus.UNPROCESSABLE_ENTITY);
 
   private final List<ValidationRule> rules;
+  private final AnimalRepository animalRepository;
   private final ApplicationRepository applicationRepository;
   private final ApplicationAnswersRepository answersRepository;
   private final StatusTransitionService statusTransitionService;
@@ -35,11 +38,13 @@ public class ApplicationSubmissionService {
 
   public ApplicationSubmissionService(
       List<ValidationRule> rules,
+      AnimalRepository animalRepository,
       ApplicationRepository applicationRepository,
       ApplicationAnswersRepository answersRepository,
       StatusTransitionService statusTransitionService,
       CurrentUserService currentUserService) {
     this.rules = rules;
+    this.animalRepository = animalRepository;
     this.applicationRepository = applicationRepository;
     this.answersRepository = answersRepository;
     this.statusTransitionService = statusTransitionService;
@@ -49,6 +54,8 @@ public class ApplicationSubmissionService {
   @Transactional
   public ApplicationCreatedResponse submit(ApplicationRequest request) {
     Long applicantId = currentUserService.getCurrentUserId();
+
+    requireAvailableAnimal(request.animalId());
 
     // Rules run in order; the first failed rule stops the submission.
     for (ValidationRule rule : rules) {
@@ -89,5 +96,18 @@ public class ApplicationSubmissionService {
         statusTransitionService.changeStatus(application.getId(), ApplicationStatus.WAITING);
 
     return new ApplicationCreatedResponse(queued.getId(), queued.getStatus());
+  }
+
+  private void requireAvailableAnimal(Long animalId) {
+    boolean available =
+        animalRepository
+            .findById(animalId)
+            .filter(animal -> animal.getStatus() == AnimalStatus.AVAILABLE)
+            .isPresent();
+
+    if (!available) {
+      throw new ApiException(
+          HttpStatus.NOT_FOUND, "ANIMAL_NOT_AVAILABLE", "Животното не е налично за осиновяване.");
+    }
   }
 }
