@@ -1,9 +1,9 @@
-package com.happytails.adoption.animals.domain;
+package com.happytails.adoption.entity;
 
-import com.happytails.adoption.animals.api.AnimalSize;
-import com.happytails.adoption.animals.api.AnimalStatus;
-import com.happytails.adoption.animals.api.RequirementType;
-import com.happytails.adoption.animals.api.Species;
+import com.happytails.adoption.enums.AnimalSize;
+import com.happytails.adoption.enums.AnimalStatus;
+import com.happytails.adoption.enums.RequirementType;
+import com.happytails.adoption.enums.Species;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;

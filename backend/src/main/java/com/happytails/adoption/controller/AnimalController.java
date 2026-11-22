@@ -1,8 +1,8 @@
-package com.happytails.adoption.animals.web;
+package com.happytails.adoption.controller;
 
-import com.happytails.adoption.animals.dto.AnimalSummaryResponse;
-import com.happytails.adoption.animals.dto.PageResponse;
-import com.happytails.adoption.animals.service.AnimalCatalogService;
+import com.happytails.adoption.dto.AnimalSummaryResponse;
+import com.happytails.adoption.dto.PageResponse;
+import com.happytails.adoption.service.AnimalCatalogService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

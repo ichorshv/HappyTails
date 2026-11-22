@@ -1,7 +1,7 @@
-package com.happytails.adoption.animals.dto;
+package com.happytails.adoption.dto;
 
-import com.happytails.adoption.animals.api.AnimalSize;
-import com.happytails.adoption.animals.api.Species;
+import com.happytails.adoption.enums.AnimalSize;
+import com.happytails.adoption.enums.Species;
 
 public record AnimalSummaryResponse(
     Long id,
