@@ -10,4 +10,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
   List<Application> findByAnimalIdAndStatusInOrderBySubmittedAtAscIdAsc(
       Long animalId, Collection<ApplicationStatus> statuses);
+
+  List<Application> findByAnimalIdOrderBySubmittedAtAscIdAsc(Long animalId);
 }
