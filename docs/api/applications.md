@@ -53,7 +53,7 @@ All errors in the project are returned in the same format:
 
 | Status                     | When                                                                      | Body / code                                                                |
 |----------------------------|---------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| `201 Created`              | All rules pass                                                            | `{ "id": 15, "status": "WAITING" }` (or `YOUR_TURN` if first in the queue) |
+| `201 Created`              | All rules pass                                                            | `{ "id": 15, "status": "YOUR_TURN" }` (or `WAITING` if someone is ahead)   |
 | `202 Accepted`             | Geocoding service is unavailable; the address check will be retried later | `{ "id": 15, "status": "SUBMITTED" }`                                      |
 | `400 Bad Request`          | The questionnaire is incomplete                                           | `VALIDATION_ERROR`, `details` lists the missing fields                     |
 | `401 Unauthorized`         | Not logged in                                                             | `UNAUTHORIZED`                                                             |
@@ -70,8 +70,22 @@ The queue position is not returned here – it comes from the queue module (Memb
 Missing fields are all returned together in `details` (400). Business rules are checked in this order and only the first
 failed rule is returned: duplicate → limit of 3 → animal requirements → distance.
 
-If an application was accepted with `202` and the later address check fails, the application becomes `REJECTED` and the
-applicant is notified by email.
+If the geocoding service is unavailable, the application is saved as `SUBMITTED` and answered with `202`. It does not
+enter the queue yet. A scheduled job checks such applications again every 5 minutes, oldest first, and stops a run when
+the service is still unavailable:
+
+- address found: the coordinates are saved and the application enters the queue (`YOUR_TURN` or `WAITING`);
+- address not found: the application becomes `REJECTED`. The email to the applicant is sent together with the other
+  notification templates.
+
+### Geocoding
+
+The address is searched as `street, city, България` with Nominatim (OpenStreetMap). The coordinates are saved with the
+application. Results are cached by address, requests are limited to one per second and carry an identifying
+`User-Agent`, as the Nominatim usage policy requires.
+
+The real service is used only when `GEOCODING_PROVIDER=nominatim`. By default (`fake`) every non-blank address gets the
+same coordinates (Sofia centre), so tests and local runs never call the internet.
 
 ## 2. View an application (staff)
 
