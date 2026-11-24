@@ -9,6 +9,7 @@ import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.entity.ApplicationAnswers;
 import com.happytails.adoption.enums.AnimalStatus;
 import com.happytails.adoption.exception.ApiException;
+import com.happytails.adoption.exception.GeocodingUnavailableException;
 import com.happytails.adoption.repository.AnimalRepository;
 import com.happytails.adoption.repository.ApplicationAnswersRepository;
 import com.happytails.adoption.repository.ApplicationRepository;
@@ -17,12 +18,17 @@ import com.happytails.adoption.validation.ValidationRule;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ApplicationSubmissionService {
+
+  private static final Logger log = LoggerFactory.getLogger(ApplicationSubmissionService.class);
 
   private static final Map<String, HttpStatus> RULE_ERROR_STATUS =
       Map.of(
@@ -54,6 +60,14 @@ public class ApplicationSubmissionService {
     this.geocodingService = geocodingService;
   }
 
+  /**
+   * Checks and saves a new application.
+   *
+   * @param request the application with questionnaire answers and address
+   * @return the new application: YOUR_TURN or WAITING when it entered the queue, or SUBMITTED when
+   *     the address could not be checked yet because the geocoding service is unavailable
+   * @throws ApiException when the animal is not available, a rule fails or the address is not found
+   */
   @Transactional
   public ApplicationCreatedResponse submit(ApplicationRequest request) {
     Long applicantId = currentUserService.getCurrentUserId();
@@ -71,7 +85,7 @@ public class ApplicationSubmissionService {
     }
 
     ApplicationAddress address = request.address();
-    Coordinates coordinates = locate(address);
+    Optional<Coordinates> coordinates = locate(address);
 
     // The coordinates are set before the first save, so they are part of the INSERT.
     Application newApplication =
@@ -82,7 +96,8 @@ public class ApplicationSubmissionService {
             address.city(),
             address.municipality(),
             Instant.now());
-    newApplication.setCoordinates(coordinates.latitude(), coordinates.longitude());
+    coordinates.ifPresent(
+        point -> newApplication.setCoordinates(point.latitude(), point.longitude()));
     Application application = applicationRepository.save(newApplication);
 
     QuestionnaireAnswers answers = request.answers();
@@ -98,6 +113,12 @@ public class ApplicationSubmissionService {
             answers.hoursAlonePerDay(),
             answers.motivation()));
 
+    if (coordinates.isEmpty()) {
+      // The address could not be checked now. The application stays SUBMITTED, outside the queue,
+      // and the address is checked again later by a scheduled job.
+      return new ApplicationCreatedResponse(application.getId(), application.getStatus());
+    }
+
     // The queue puts the application in line: YOUR_TURN (with a 48-hour deadline) for the first
     // applicant of the animal, WAITING for everyone else.
     Application queued = queueEntryService.onApplicationValidated(application.getId());
@@ -105,18 +126,30 @@ public class ApplicationSubmissionService {
     return new ApplicationCreatedResponse(queued.getId(), queued.getStatus());
   }
 
-  /** Finds the coordinates of the address; an address that is not on the map is rejected. */
-  private Coordinates locate(ApplicationAddress address) {
+  /**
+   * Finds the coordinates of the address.
+   *
+   * @return the coordinates, or empty when the geocoding service is unavailable
+   * @throws ApiException ADDRESS_NOT_FOUND when the service works but does not know the address
+   */
+  private Optional<Coordinates> locate(ApplicationAddress address) {
     // The shelter works in Bulgaria, so the country is added to avoid matches abroad.
     String searchText = address.street() + ", " + address.city() + ", България";
-    return geocodingService
-        .geocode(searchText)
-        .orElseThrow(
-            () ->
-                new ApiException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "ADDRESS_NOT_FOUND",
-                    "Адресът не беше намерен на картата."));
+    try {
+      Coordinates found =
+          geocodingService
+              .geocode(searchText)
+              .orElseThrow(
+                  () ->
+                      new ApiException(
+                          HttpStatus.UNPROCESSABLE_ENTITY,
+                          "ADDRESS_NOT_FOUND",
+                          "Адресът не беше намерен на картата."));
+      return Optional.of(found);
+    } catch (GeocodingUnavailableException e) {
+      log.warn("Geocoding is unavailable, the application will be checked later", e);
+      return Optional.empty();
+    }
   }
 
   private void requireAvailableAnimal(Long animalId) {

@@ -1,6 +1,7 @@
 package com.happytails.adoption.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -22,6 +23,7 @@ import com.happytails.adoption.enums.AnimalStatus;
 import com.happytails.adoption.enums.ApplicationStatus;
 import com.happytails.adoption.enums.HousingType;
 import com.happytails.adoption.exception.ApiException;
+import com.happytails.adoption.exception.GeocodingUnavailableException;
 import com.happytails.adoption.repository.AnimalRepository;
 import com.happytails.adoption.repository.ApplicationAnswersRepository;
 import com.happytails.adoption.repository.ApplicationRepository;
@@ -129,6 +131,26 @@ class ApplicationSubmissionServiceTest {
     assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatus());
     assertEquals("ADDRESS_NOT_FOUND", ex.getCode());
     verifyNoInteractions(applicationRepository, answersRepository, queueEntryService);
+  }
+
+  @Test
+  void keepsApplicationSubmittedWhenGeocodingIsUnavailable() {
+    givenAvailableAnimal();
+    givenRulesPass();
+    when(geocodingService.geocode(anyString()))
+        .thenThrow(new GeocodingUnavailableException("down", new RuntimeException()));
+    when(applicationRepository.save(any(Application.class)))
+        .thenReturn(application(17L, ApplicationStatus.SUBMITTED));
+
+    ApplicationCreatedResponse response = service.submit(request());
+
+    assertEquals(17L, response.id());
+    assertEquals(ApplicationStatus.SUBMITTED, response.status());
+    ArgumentCaptor<Application> saved = ArgumentCaptor.forClass(Application.class);
+    verify(applicationRepository).save(saved.capture());
+    assertNull(saved.getValue().getLatitude());
+    verify(answersRepository).save(any(ApplicationAnswers.class));
+    verifyNoInteractions(queueEntryService);
   }
 
   @Test
