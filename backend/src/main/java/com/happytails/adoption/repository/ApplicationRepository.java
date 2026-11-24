@@ -9,10 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
   List<Application> findByAnimalIdAndStatusInOrderBySubmittedAtAscIdAsc(
-      Long animalId, Collection<ApplicationStatus> statuses);
+          Long animalId, Collection<ApplicationStatus> statuses);
+
+  List<Application> findByAnimalIdOrderBySubmittedAtAscIdAsc(Long animalId);
 
   boolean existsByApplicantIdAndAnimalIdAndStatusIn(
-      Long applicantId, Long animalId, Collection<ApplicationStatus> statuses);
+          Long applicantId, Long animalId, Collection<ApplicationStatus> statuses);
 
   long countByApplicantIdAndStatusIn(Long applicantId, Collection<ApplicationStatus> statuses);
 }
