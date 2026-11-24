@@ -7,7 +7,6 @@ import com.happytails.adoption.dto.QuestionnaireAnswers;
 import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.entity.ApplicationAnswers;
 import com.happytails.adoption.enums.AnimalStatus;
-import com.happytails.adoption.enums.ApplicationStatus;
 import com.happytails.adoption.exception.ApiException;
 import com.happytails.adoption.repository.AnimalRepository;
 import com.happytails.adoption.repository.ApplicationAnswersRepository;
@@ -33,7 +32,7 @@ public class ApplicationSubmissionService {
   private final AnimalRepository animalRepository;
   private final ApplicationRepository applicationRepository;
   private final ApplicationAnswersRepository answersRepository;
-  private final StatusTransitionService statusTransitionService;
+  private final ApplicationQueueEntryService queueEntryService;
   private final CurrentUserService currentUserService;
 
   public ApplicationSubmissionService(
@@ -41,13 +40,13 @@ public class ApplicationSubmissionService {
       AnimalRepository animalRepository,
       ApplicationRepository applicationRepository,
       ApplicationAnswersRepository answersRepository,
-      StatusTransitionService statusTransitionService,
+      ApplicationQueueEntryService queueEntryService,
       CurrentUserService currentUserService) {
     this.rules = rules;
     this.animalRepository = animalRepository;
     this.applicationRepository = applicationRepository;
     this.answersRepository = answersRepository;
-    this.statusTransitionService = statusTransitionService;
+    this.queueEntryService = queueEntryService;
     this.currentUserService = currentUserService;
   }
 
@@ -91,9 +90,9 @@ public class ApplicationSubmissionService {
             answers.hoursAlonePerDay(),
             answers.motivation()));
 
-    // TODO: QueueService will promote the first applicant to YOUR_TURN (agreed with Gosho).
-    Application queued =
-        statusTransitionService.changeStatus(application.getId(), ApplicationStatus.WAITING);
+    // The queue puts the application in line: YOUR_TURN (with a 48-hour deadline) for the first
+    // applicant of the animal, WAITING for everyone else.
+    Application queued = queueEntryService.onApplicationValidated(application.getId());
 
     return new ApplicationCreatedResponse(queued.getId(), queued.getStatus());
   }

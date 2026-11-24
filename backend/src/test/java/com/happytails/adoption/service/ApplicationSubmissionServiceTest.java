@@ -44,7 +44,7 @@ class ApplicationSubmissionServiceTest {
   @Mock private AnimalRepository animalRepository;
   @Mock private ApplicationRepository applicationRepository;
   @Mock private ApplicationAnswersRepository answersRepository;
-  @Mock private StatusTransitionService statusTransitionService;
+  @Mock private ApplicationQueueEntryService queueEntryService;
   @Mock private CurrentUserService currentUserService;
 
   private ApplicationSubmissionService service;
@@ -57,26 +57,40 @@ class ApplicationSubmissionServiceTest {
             animalRepository,
             applicationRepository,
             answersRepository,
-            statusTransitionService,
+            queueEntryService,
             currentUserService);
     when(currentUserService.getCurrentUserId()).thenReturn(1L);
   }
 
   @Test
-  void savesApplicationAndMovesItToWaitingWhenAllRulesPass() {
+  void firstApplicantOfTheAnimalGetsYourTurn() {
     givenAvailableAnimal();
-    when(firstRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
-    when(secondRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
+    givenRulesPass();
     when(applicationRepository.save(any(Application.class)))
         .thenReturn(application(15L, ApplicationStatus.SUBMITTED));
-    when(statusTransitionService.changeStatus(15L, ApplicationStatus.WAITING))
-        .thenReturn(application(15L, ApplicationStatus.WAITING));
+    when(queueEntryService.onApplicationValidated(15L))
+        .thenReturn(application(15L, ApplicationStatus.YOUR_TURN));
 
     ApplicationCreatedResponse response = service.submit(request());
 
     assertEquals(15L, response.id());
-    assertEquals(ApplicationStatus.WAITING, response.status());
+    assertEquals(ApplicationStatus.YOUR_TURN, response.status());
     verify(answersRepository).save(any(ApplicationAnswers.class));
+  }
+
+  @Test
+  void applicantWithSomeoneAheadGetsWaiting() {
+    givenAvailableAnimal();
+    givenRulesPass();
+    when(applicationRepository.save(any(Application.class)))
+        .thenReturn(application(16L, ApplicationStatus.SUBMITTED));
+    when(queueEntryService.onApplicationValidated(16L))
+        .thenReturn(application(16L, ApplicationStatus.WAITING));
+
+    ApplicationCreatedResponse response = service.submit(request());
+
+    assertEquals(16L, response.id());
+    assertEquals(ApplicationStatus.WAITING, response.status());
   }
 
   @Test
@@ -91,7 +105,7 @@ class ApplicationSubmissionServiceTest {
 
     assertEquals(HttpStatus.CONFLICT, ex.getStatus());
     assertEquals("APPLICATION_DUPLICATE", ex.getCode());
-    verifyNoInteractions(secondRule, applicationRepository, answersRepository);
+    verifyNoInteractions(secondRule, applicationRepository, answersRepository, queueEntryService);
   }
 
   @Test
@@ -107,7 +121,7 @@ class ApplicationSubmissionServiceTest {
 
     assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatus());
     assertEquals("APPLICATION_LIMIT_REACHED", ex.getCode());
-    verifyNoInteractions(applicationRepository, answersRepository);
+    verifyNoInteractions(applicationRepository, answersRepository, queueEntryService);
   }
 
   @Test
@@ -118,7 +132,8 @@ class ApplicationSubmissionServiceTest {
 
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
     assertEquals("ANIMAL_NOT_AVAILABLE", ex.getCode());
-    verifyNoInteractions(firstRule, secondRule, applicationRepository, answersRepository);
+    verifyNoInteractions(
+        firstRule, secondRule, applicationRepository, answersRepository, queueEntryService);
   }
 
   @Test
@@ -129,7 +144,13 @@ class ApplicationSubmissionServiceTest {
 
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
     assertEquals("ANIMAL_NOT_AVAILABLE", ex.getCode());
-    verifyNoInteractions(firstRule, secondRule, applicationRepository, answersRepository);
+    verifyNoInteractions(
+        firstRule, secondRule, applicationRepository, answersRepository, queueEntryService);
+  }
+
+  private void givenRulesPass() {
+    when(firstRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
+    when(secondRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
   }
 
   private void givenAvailableAnimal() {

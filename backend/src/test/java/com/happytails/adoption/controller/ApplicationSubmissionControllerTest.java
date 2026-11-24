@@ -91,14 +91,14 @@ class ApplicationSubmissionControllerTest {
 
   @Test
   @WithMockUser(username = EMAIL, roles = "APPLICANT")
-  @DisplayName("A valid application is created and put in the queue (201, WAITING)")
+  @DisplayName("A valid application is created and put in the queue (201, YOUR_TURN)")
   void createsApplication() throws Exception {
     createUser(EMAIL, Role.APPLICANT);
 
     submit(validBody(1))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").isNumber())
-        .andExpect(jsonPath("$.status").value("WAITING"));
+        .andExpect(jsonPath("$.status").value("YOUR_TURN"));
   }
 
   @Test
