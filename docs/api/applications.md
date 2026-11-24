@@ -156,17 +156,21 @@ applicant is notified by email.
 
 Coordinates are rounded to 2 decimal places (about 1 km), so the adopter's exact address is not shown.
 
+## Animal requirements rule
+
+Each requirement of the animal is checked against exactly one questionnaire answer. An application is rejected with
+`422 REQUIREMENT_NOT_MET` when an answer conflicts with a requirement. Only the first unmet requirement is returned, in
+the order of the table.
+
+| Animal requirement  | Meaning                           | Checked with        | Rejected when               | Message                                              |
+|---------------------|-----------------------------------|---------------------|-----------------------------|------------------------------------------------------|
+| `YARD`              | needs a yard                      | `hasYard`           | `hasYard` is false          | Животното има нужда от двор.                         |
+| `NO_CATS`           | does not get along with cats      | `hasCats`           | `hasCats` is true           | Животното не е подходящо за дом с котки.             |
+| `NO_DOGS`           | does not get along with dogs      | `hasDogs`           | `hasDogs` is true           | Животното не е подходящо за дом с кучета.            |
+| `NO_SMALL_CHILDREN` | not suitable for children under 6 | `hasChildrenUnder6` | `hasChildrenUnder6` is true | Животното не е подходящо за дом с деца под 6 години. |
+| `EXPERIENCE`        | requires an experienced owner     | `hasExperience`     | `hasExperience` is false    | Животното има нужда от опитен стопанин.              |
+
 ## To be agreed
-
-**With Member 2 – animal requirements.** Each requirement is checked against exactly one questionnaire answer:
-
-| Animal requirement  | Meaning                           | Checked with        |
-|---------------------|-----------------------------------|---------------------|
-| `YARD`              | needs a yard                      | `hasYard`           |
-| `NO_CATS`           | does not get along with cats      | `hasCats`           |
-| `NO_DOGS`           | does not get along with dogs      | `hasDogs`           |
-| `NO_SMALL_CHILDREN` | not suitable for children under 6 | `hasChildrenUnder6` |
-| `EXPERIENCE`        | requires an experienced owner     | `hasExperience`     |
 
 **With Member 4 – queue position.** Proposal: the applicant gets status and position from `GET /api/applications/my`
 (queue module).
