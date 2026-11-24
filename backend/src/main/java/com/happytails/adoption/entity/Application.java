@@ -141,6 +141,11 @@ public class Application {
     this.turnDeadline = turnDeadline;
   }
 
+  public void setCoordinates(double latitude, double longitude) {
+    this.latitude = latitude;
+    this.longitude = longitude;
+  }
+
   public void setLocation(double latitude, double longitude, double distanceKm) {
     this.latitude = latitude;
     this.longitude = longitude;

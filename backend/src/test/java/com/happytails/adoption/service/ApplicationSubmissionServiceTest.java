@@ -3,6 +3,7 @@ package com.happytails.adoption.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 import com.happytails.adoption.dto.ApplicationAddress;
 import com.happytails.adoption.dto.ApplicationCreatedResponse;
 import com.happytails.adoption.dto.ApplicationRequest;
+import com.happytails.adoption.dto.Coordinates;
 import com.happytails.adoption.dto.QuestionnaireAnswers;
 import com.happytails.adoption.entity.Animal;
 import com.happytails.adoption.entity.Application;
@@ -31,6 +33,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -46,6 +49,7 @@ class ApplicationSubmissionServiceTest {
   @Mock private ApplicationAnswersRepository answersRepository;
   @Mock private ApplicationQueueEntryService queueEntryService;
   @Mock private CurrentUserService currentUserService;
+  @Mock private GeocodingService geocodingService;
 
   private ApplicationSubmissionService service;
 
@@ -58,7 +62,8 @@ class ApplicationSubmissionServiceTest {
             applicationRepository,
             answersRepository,
             queueEntryService,
-            currentUserService);
+            currentUserService,
+            geocodingService);
     when(currentUserService.getCurrentUserId()).thenReturn(1L);
   }
 
@@ -66,6 +71,7 @@ class ApplicationSubmissionServiceTest {
   void firstApplicantOfTheAnimalGetsYourTurn() {
     givenAvailableAnimal();
     givenRulesPass();
+    givenAddressFound();
     when(applicationRepository.save(any(Application.class)))
         .thenReturn(application(15L, ApplicationStatus.SUBMITTED));
     when(queueEntryService.onApplicationValidated(15L))
@@ -82,6 +88,7 @@ class ApplicationSubmissionServiceTest {
   void applicantWithSomeoneAheadGetsWaiting() {
     givenAvailableAnimal();
     givenRulesPass();
+    givenAddressFound();
     when(applicationRepository.save(any(Application.class)))
         .thenReturn(application(16L, ApplicationStatus.SUBMITTED));
     when(queueEntryService.onApplicationValidated(16L))
@@ -91,6 +98,37 @@ class ApplicationSubmissionServiceTest {
 
     assertEquals(16L, response.id());
     assertEquals(ApplicationStatus.WAITING, response.status());
+  }
+
+  @Test
+  void savesTheCoordinatesOfTheAddress() {
+    givenAvailableAnimal();
+    givenRulesPass();
+    givenAddressFound();
+    when(applicationRepository.save(any(Application.class)))
+        .thenReturn(application(15L, ApplicationStatus.SUBMITTED));
+    when(queueEntryService.onApplicationValidated(15L))
+        .thenReturn(application(15L, ApplicationStatus.YOUR_TURN));
+
+    service.submit(request());
+
+    ArgumentCaptor<Application> saved = ArgumentCaptor.forClass(Application.class);
+    verify(applicationRepository).save(saved.capture());
+    assertEquals(42.6977, saved.getValue().getLatitude());
+    assertEquals(23.3219, saved.getValue().getLongitude());
+  }
+
+  @Test
+  void rejectsAddressThatIsNotFoundAndSavesNothing() {
+    givenAvailableAnimal();
+    givenRulesPass();
+    when(geocodingService.geocode(anyString())).thenReturn(Optional.empty());
+
+    ApiException ex = assertThrows(ApiException.class, () -> service.submit(request()));
+
+    assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatus());
+    assertEquals("ADDRESS_NOT_FOUND", ex.getCode());
+    verifyNoInteractions(applicationRepository, answersRepository, queueEntryService);
   }
 
   @Test
@@ -105,7 +143,8 @@ class ApplicationSubmissionServiceTest {
 
     assertEquals(HttpStatus.CONFLICT, ex.getStatus());
     assertEquals("APPLICATION_DUPLICATE", ex.getCode());
-    verifyNoInteractions(secondRule, applicationRepository, answersRepository, queueEntryService);
+    verifyNoInteractions(
+        secondRule, geocodingService, applicationRepository, answersRepository, queueEntryService);
   }
 
   @Test
@@ -121,7 +160,8 @@ class ApplicationSubmissionServiceTest {
 
     assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatus());
     assertEquals("APPLICATION_LIMIT_REACHED", ex.getCode());
-    verifyNoInteractions(applicationRepository, answersRepository, queueEntryService);
+    verifyNoInteractions(
+        geocodingService, applicationRepository, answersRepository, queueEntryService);
   }
 
   @Test
@@ -133,7 +173,12 @@ class ApplicationSubmissionServiceTest {
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
     assertEquals("ANIMAL_NOT_AVAILABLE", ex.getCode());
     verifyNoInteractions(
-        firstRule, secondRule, applicationRepository, answersRepository, queueEntryService);
+        firstRule,
+        secondRule,
+        geocodingService,
+        applicationRepository,
+        answersRepository,
+        queueEntryService);
   }
 
   @Test
@@ -145,12 +190,22 @@ class ApplicationSubmissionServiceTest {
     assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
     assertEquals("ANIMAL_NOT_AVAILABLE", ex.getCode());
     verifyNoInteractions(
-        firstRule, secondRule, applicationRepository, answersRepository, queueEntryService);
+        firstRule,
+        secondRule,
+        geocodingService,
+        applicationRepository,
+        answersRepository,
+        queueEntryService);
   }
 
   private void givenRulesPass() {
     when(firstRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
     when(secondRule.validate(eq(1L), any())).thenReturn(ValidationResult.pass());
+  }
+
+  private void givenAddressFound() {
+    when(geocodingService.geocode(anyString()))
+        .thenReturn(Optional.of(new Coordinates(42.6977, 23.3219)));
   }
 
   private void givenAvailableAnimal() {

@@ -3,6 +3,7 @@ package com.happytails.adoption.service;
 import com.happytails.adoption.dto.ApplicationAddress;
 import com.happytails.adoption.dto.ApplicationCreatedResponse;
 import com.happytails.adoption.dto.ApplicationRequest;
+import com.happytails.adoption.dto.Coordinates;
 import com.happytails.adoption.dto.QuestionnaireAnswers;
 import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.entity.ApplicationAnswers;
@@ -34,6 +35,7 @@ public class ApplicationSubmissionService {
   private final ApplicationAnswersRepository answersRepository;
   private final ApplicationQueueEntryService queueEntryService;
   private final CurrentUserService currentUserService;
+  private final GeocodingService geocodingService;
 
   public ApplicationSubmissionService(
       List<ValidationRule> rules,
@@ -41,13 +43,15 @@ public class ApplicationSubmissionService {
       ApplicationRepository applicationRepository,
       ApplicationAnswersRepository answersRepository,
       ApplicationQueueEntryService queueEntryService,
-      CurrentUserService currentUserService) {
+      CurrentUserService currentUserService,
+      GeocodingService geocodingService) {
     this.rules = rules;
     this.animalRepository = animalRepository;
     this.applicationRepository = applicationRepository;
     this.answersRepository = answersRepository;
     this.queueEntryService = queueEntryService;
     this.currentUserService = currentUserService;
+    this.geocodingService = geocodingService;
   }
 
   @Transactional
@@ -67,15 +71,19 @@ public class ApplicationSubmissionService {
     }
 
     ApplicationAddress address = request.address();
-    Application application =
-        applicationRepository.save(
-            new Application(
-                applicantId,
-                request.animalId(),
-                address.street(),
-                address.city(),
-                address.municipality(),
-                Instant.now()));
+    Coordinates coordinates = locate(address);
+
+    // The coordinates are set before the first save, so they are part of the INSERT.
+    Application newApplication =
+        new Application(
+            applicantId,
+            request.animalId(),
+            address.street(),
+            address.city(),
+            address.municipality(),
+            Instant.now());
+    newApplication.setCoordinates(coordinates.latitude(), coordinates.longitude());
+    Application application = applicationRepository.save(newApplication);
 
     QuestionnaireAnswers answers = request.answers();
     answersRepository.save(
@@ -95,6 +103,20 @@ public class ApplicationSubmissionService {
     Application queued = queueEntryService.onApplicationValidated(application.getId());
 
     return new ApplicationCreatedResponse(queued.getId(), queued.getStatus());
+  }
+
+  /** Finds the coordinates of the address; an address that is not on the map is rejected. */
+  private Coordinates locate(ApplicationAddress address) {
+    // The shelter works in Bulgaria, so the country is added to avoid matches abroad.
+    String searchText = address.street() + ", " + address.city() + ", България";
+    return geocodingService
+        .geocode(searchText)
+        .orElseThrow(
+            () ->
+                new ApiException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "ADDRESS_NOT_FOUND",
+                    "Адресът не беше намерен на картата."));
   }
 
   private void requireAvailableAnimal(Long animalId) {
