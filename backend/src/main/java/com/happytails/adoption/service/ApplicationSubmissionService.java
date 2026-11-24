@@ -133,8 +133,7 @@ public class ApplicationSubmissionService {
    * @throws ApiException ADDRESS_NOT_FOUND when the service works but does not know the address
    */
   private Optional<Coordinates> locate(ApplicationAddress address) {
-    // The shelter works in Bulgaria, so the country is added to avoid matches abroad.
-    String searchText = address.street() + ", " + address.city() + ", България";
+    String searchText = AddressText.of(address.street(), address.city());
     try {
       Coordinates found =
           geocodingService
