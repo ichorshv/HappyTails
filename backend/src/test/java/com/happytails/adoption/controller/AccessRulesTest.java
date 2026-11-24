@@ -89,7 +89,7 @@ class AccessRulesTest {
   @WithMockUser(roles = "ADMIN")
   @DisplayName("Admin passes the security check on the admin-only endpoints")
   void adminCanUseAdminOnlyEndpoints() throws Exception {
-    mockMvc.perform(get("/api/admin/users")).andExpect(status().isNotFound());
+    mockMvc.perform(get("/api/admin/users")).andExpect(status().isOk());
     mockMvc.perform(get("/api/admin/walk-settings")).andExpect(status().isNotFound());
     mockMvc.perform(get("/api/admin/geo-settings")).andExpect(status().isNotFound());
   }

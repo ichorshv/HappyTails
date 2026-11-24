@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -34,16 +35,19 @@ public class AuthController {
   private final CurrentUserService currentUserService;
   private final SecurityContextRepository securityContextRepository;
   private final CsrfTokenRepository csrfTokenRepository;
+  private final SessionRegistry sessionRegistry;
 
   public AuthController(
       UserService userService,
       CurrentUserService currentUserService,
       SecurityContextRepository securityContextRepository,
-      CsrfTokenRepository csrfTokenRepository) {
+      CsrfTokenRepository csrfTokenRepository,
+      SessionRegistry sessionRegistry) {
     this.userService = userService;
     this.currentUserService = currentUserService;
     this.securityContextRepository = securityContextRepository;
     this.csrfTokenRepository = csrfTokenRepository;
+    this.sessionRegistry = sessionRegistry;
   }
 
   @PostMapping("/register")
@@ -93,6 +97,8 @@ public class AuthController {
     context.setAuthentication(auth);
     SecurityContextHolder.setContext(context);
     securityContextRepository.saveContext(context, request, response);
+    // So the admin can end this session when the user is deactivated (ADR-0003).
+    sessionRegistry.registerNewSession(request.getSession().getId(), user);
     renewCsrfToken(request, response);
   }
 

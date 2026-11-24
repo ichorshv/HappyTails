@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,6 +15,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 /** Login with a server session and CSRF cookie, see docs/adr/0003-session-vs-jwt.md. */
 @Configuration
@@ -22,11 +25,22 @@ public class SecurityConfig {
   SecurityFilterChain filterChain(
       HttpSecurity http,
       SecurityContextRepository securityContextRepository,
-      CsrfTokenRepository csrfTokenRepository)
+      CsrfTokenRepository csrfTokenRepository,
+      SessionRegistry sessionRegistry)
       throws Exception {
     http.csrf(csrf -> csrf.spa().csrfTokenRepository(csrfTokenRepository))
         .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
         .securityContext(context -> context.securityContextRepository(securityContextRepository))
+        // Every session is in the registry (AuthController adds it at login), so the admin can
+        // end a deactivated user's sessions; the next request then gets 401.
+        .sessionManagement(
+            session ->
+                session.sessionConcurrency(
+                    concurrency ->
+                        concurrency
+                            .maximumSessions(-1)
+                            .sessionRegistry(sessionRegistry)
+                            .expiredSessionStrategy(JsonErrorHandlers.sessionExpired())))
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .logout(AbstractHttpConfigurer::disable)
@@ -73,6 +87,17 @@ public class SecurityConfig {
   @Bean
   CsrfTokenRepository csrfTokenRepository() {
     return CookieCsrfTokenRepository.withHttpOnlyFalse();
+  }
+
+  @Bean
+  SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
+  }
+
+  /** Tells the registry when a session ends or changes its ID. */
+  @Bean
+  HttpSessionEventPublisher httpSessionEventPublisher() {
+    return new HttpSessionEventPublisher();
   }
 
   @Bean
