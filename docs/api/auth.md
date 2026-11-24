@@ -87,7 +87,7 @@ The frontend calls it on page load to know who is logged in.
 
 `GET /api/admin/users?role=STAFF&page=0&size=20` · role: **ADMIN**
 
-`role` is optional (`APPLICANT`, `STAFF` or `ADMIN`). Without it the list contains all users, applicants included, sorted by `id`.
+`role` is optional (`APPLICANT`, `STAFF` or `ADMIN`). Without it the list contains all users, applicants included, sorted by `id`. `page` starts from 0 (default 0); `size` is from 1 to 100 (default 20).
 
 ```json
 {
@@ -95,8 +95,8 @@ The frontend calls it on page load to know who is logged in.
     { "id": 2, "email": "ivan@happytails.bg", "fullName": "Иван Петров", "role": "STAFF", "active": true }
   ],
   "page": 0,
-  "size": 20,
-  "totalElements": 1
+  "totalElements": 1,
+  "totalPages": 1
 }
 ```
 
@@ -138,7 +138,7 @@ When a user is deactivated, the server ends all their sessions at once (through 
 | Status | When | Code |
 |---|---|---|
 | `200 OK` / `201 Created` | Success | the user (see above) |
-| `400 Bad Request` | Invalid field | `VALIDATION_ERROR` |
+| `400 Bad Request` | Invalid field, `role` is `APPLICANT` when creating, or wrong `role`/`page`/`size` in the list | `VALIDATION_ERROR` |
 | `401` / `403` | Not logged in / not an admin | `UNAUTHORIZED` / `FORBIDDEN` |
 | `404 Not Found` | The user does not exist | `USER_NOT_FOUND` |
 | `409 Conflict` | The email is already registered | `AUTH_EMAIL_TAKEN` |
