@@ -158,7 +158,7 @@ class LoginTest {
                     .content(
                         """
                         {"email": "maria@example.com", "password": "Parola123",
-                         "fullName": "Мария Иванова"}
+                         "fullName": "Мария Иванова", "city": "София", "municipality": "Столична"}
                         """))
             .andExpect(status().isCreated())
             .andReturn();

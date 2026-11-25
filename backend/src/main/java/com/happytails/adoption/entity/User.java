@@ -35,6 +35,13 @@ public class User {
   @Column(nullable = false)
   private boolean active;
 
+  /** Only applicants have these; they enter them at registration. */
+  @Column(length = 100)
+  private String city;
+
+  @Column(length = 100)
+  private String municipality;
+
   @Column(nullable = false, updatable = false)
   private Instant createdAt;
 
@@ -75,6 +82,19 @@ public class User {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public String getCity() {
+    return city;
+  }
+
+  public String getMunicipality() {
+    return municipality;
+  }
+
+  public void setLocation(String city, String municipality) {
+    this.city = city;
+    this.municipality = municipality;
   }
 
   public Instant getCreatedAt() {
