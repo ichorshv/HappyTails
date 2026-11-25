@@ -3,9 +3,11 @@ package com.happytails.adoption.service;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("!dev & !brevo")
 public class LoggingNotificationService implements NotificationService {
 
   private static final Logger log = LoggerFactory.getLogger(LoggingNotificationService.class);
