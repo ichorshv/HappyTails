@@ -5,7 +5,7 @@ export default function Input({ label, error, className = '', ...props }) {
   const errorId = `${id}-error`
   return (
     <div className={className}>
-      <label htmlFor={id} className="mb-2 block px-11 text-lg font-bold text-ink sm:text-2xl">
+      <label htmlFor={id} className="mb-1 block px-5 text-sm font-bold text-ink">
         {label}
       </label>
       <input
@@ -16,7 +16,7 @@ export default function Input({ label, error, className = '', ...props }) {
         {...props}
       />
       {error && (
-        <p id={errorId} className="mt-1 px-11 text-sm font-bold text-danger">
+        <p id={errorId} className="mt-1 px-5 text-sm font-bold text-danger">
           {error}
         </p>
       )}
