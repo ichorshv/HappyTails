@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.happytails.adoption.dto.FreeSlotsResponse;
 import com.happytails.adoption.exception.ApiException;
+import com.happytails.adoption.service.WalkBookingService;
 import com.happytails.adoption.service.WalkSlotService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,8 @@ import org.springframework.http.HttpStatus;
 class WalkControllerTest {
 
   private final WalkSlotService slotService = mock(WalkSlotService.class);
-  private final WalkController controller = new WalkController(slotService);
+  private final WalkBookingService bookingService = mock(WalkBookingService.class);
+  private final WalkController controller = new WalkController(slotService, bookingService);
 
   @Test
   @DisplayName("A missing animalId returns 400 with code VALIDATION_ERROR")
