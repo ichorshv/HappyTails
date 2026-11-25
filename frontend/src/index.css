@@ -1,2 +1,73 @@
 @import "tailwindcss";
 @import "./shared/theme.css";
+
+/*
+ * No rubber-band bounce at the top and bottom of the page: it pulled the page away from the
+ * fixed color glows and showed a plain strip with a sharp line above the green glow.
+ */
+html {
+  overscroll-behavior-y: none;
+}
+
+/*
+ * Home page footer: the two glows slide in from the sides and merge into the panel while the
+ * footer scrolls into view (scroll-driven, so scrolling back up separates them again).
+ * Browsers without scroll timelines, and users who prefer less motion, see the merged state.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* All three parts follow the footer box, not their own */
+    .site-footer {
+      view-timeline: --site-footer;
+    }
+
+    .footer-orb-left,
+    .footer-orb-right,
+    .footer-panel {
+      animation: ease-in-out both;
+      animation-timeline: --site-footer;
+      animation-range: entry 0% entry 100%;
+    }
+
+    .footer-orb-left {
+      animation-name: footer-orb-left;
+    }
+
+    .footer-orb-right {
+      animation-name: footer-orb-right;
+    }
+
+    .footer-panel {
+      animation-name: footer-panel;
+    }
+  }
+}
+
+/* The glows start at the screen edges, meet in the middle and fade into the panel */
+@keyframes footer-orb-left {
+  from {
+    transform: translateX(-45vw) scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: none;
+    opacity: 0;
+  }
+}
+
+@keyframes footer-orb-right {
+  from {
+    transform: translateX(45vw) scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: none;
+    opacity: 0;
+  }
+}
+
+@keyframes footer-panel {
+  from {
+    opacity: 0;
+  }
+}
