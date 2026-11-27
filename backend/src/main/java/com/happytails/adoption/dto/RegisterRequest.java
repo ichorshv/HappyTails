@@ -13,4 +13,6 @@ public record RegisterRequest(
             regexp = "^(?=.*\\p{L})(?=.*\\d).*$",
             message = "трябва да съдържа поне една буква и една цифра")
         String password,
-    @NotBlank @Size(min = 2, max = 100) String fullName) {}
+    @NotBlank @Size(min = 2, max = 100) String fullName,
+    @NotBlank @Size(max = 100) String city,
+    @NotBlank @Size(max = 100) String municipality) {}

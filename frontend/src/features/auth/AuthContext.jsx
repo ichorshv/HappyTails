@@ -22,8 +22,9 @@ export function AuthProvider({ children }) {
     return response.data
   }, [])
 
-  const register = useCallback(async (fullName, email, password) => {
-    const response = await apiClient.post('/auth/register', { fullName, email, password })
+  /** form: { fullName, email, password, city, municipality } */
+  const register = useCallback(async (form) => {
+    const response = await apiClient.post('/auth/register', form)
     setUser(response.data)
     return response.data
   }, [])

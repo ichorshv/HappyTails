@@ -48,7 +48,8 @@ class CsrfCookieTest {
 
     String body =
         """
-        {"email": "csrf@example.com", "password": "Parola123", "fullName": "Тест Тестов"}
+        {"email": "csrf@example.com", "password": "Parola123", "fullName": "Тест Тестов",
+         "city": "София", "municipality": "Столична"}
         """;
     mockMvc
         .perform(
