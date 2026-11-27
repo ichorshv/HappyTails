@@ -22,19 +22,22 @@ Creates an applicant account. Staff accounts are created by the admin (section 5
 {
   "email": "maria@example.com",
   "password": "Parola123",
-  "fullName": "Мария Иванова"
+  "fullName": "Мария Иванова",
+  "city": "Пловдив",
+  "municipality": "Пловдив"
 }
 ```
 
 - `email` – required, valid email format, at most 254 characters. It is stored in lower case, so `Maria@Example.com` and `maria@example.com` are the same account.
 - `password` – required, 8 to 72 characters, with at least one letter and one digit. It is stored only as a BCrypt hash (BCrypt uses at most 72 bytes).
 - `fullName` – required, 2 to 100 characters, spaces at the start and end are removed.
+- `city`, `municipality` – required, up to 100 characters each, spaces at the start and end are removed. Staff accounts have none (`null`).
 
 ### Responses
 
 | Status | When | Body / code |
 |---|---|---|
-| `201 Created` | The account is created and the user is logged in | `{ "id": 5, "email": "maria@example.com", "fullName": "Мария Иванова", "role": "APPLICANT" }` |
+| `201 Created` | The account is created and the user is logged in | `{ "id": 5, "email": "maria@example.com", "fullName": "Мария Иванова", "role": "APPLICANT", "city": "Пловдив", "municipality": "Пловдив" }` |
 | `400 Bad Request` | A field is missing or invalid | `VALIDATION_ERROR` |
 | `409 Conflict` | The email is already registered | `AUTH_EMAIL_TAKEN` |
 
@@ -78,7 +81,7 @@ The frontend calls it on page load to know who is logged in.
 
 | Status | When | Body / code |
 |---|---|---|
-| `200 OK` | Logged in | `{ "id": 5, "email": "maria@example.com", "fullName": "Мария Иванова", "role": "APPLICANT" }` |
+| `200 OK` | Logged in | `{ "id": 5, "email": "maria@example.com", "fullName": "Мария Иванова", "role": "APPLICANT", "city": "Пловдив", "municipality": "Пловдив" }` |
 | `401 Unauthorized` | Not logged in | `UNAUTHORIZED` |
 
 ## 5. Staff accounts (admin)

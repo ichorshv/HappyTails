@@ -24,6 +24,13 @@ export function validateFullName(fullName) {
   return null
 }
 
+export function validatePlace(value, emptyMessage) {
+  const length = value.trim().length
+  if (length === 0) return emptyMessage
+  if (length > 100) return 'Най-много 100 знака.'
+  return null
+}
+
 /** Keeps only the fields that have an error. */
 export function onlyErrors(errors) {
   return Object.fromEntries(Object.entries(errors).filter(([, value]) => value))

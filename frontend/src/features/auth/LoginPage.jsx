@@ -49,7 +49,7 @@ export default function LoginPage() {
 
   return (
     <AuthLayout>
-      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-8">
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-3">
         <FormError message={formError} />
         <Input
           label="Имейл:"
@@ -67,7 +67,7 @@ export default function LoginPage() {
           onChange={(event) => setPassword(event.target.value)}
           error={errors.password}
         />
-        <div className="flex flex-col items-center gap-4">
+        <div className="mt-1 flex flex-col items-center gap-3">
           <Button type="submit" disabled={submitting}>
             Вход
           </Button>

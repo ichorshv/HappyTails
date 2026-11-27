@@ -55,6 +55,7 @@ public class UserService {
             request.fullName().strip(),
             Role.APPLICANT,
             clock.instant());
+    user.setLocation(request.city().strip(), request.municipality().strip());
     try {
       return UserMapper.toResponse(userRepository.saveAndFlush(user));
     } catch (DataIntegrityViolationException ex) {

@@ -6,7 +6,13 @@ import Input from '../../shared/ui/Input'
 import AuthLayout from './AuthLayout'
 import { useAuth } from './AuthContext'
 import FormError from './FormError'
-import { onlyErrors, validateEmail, validateFullName, validatePassword } from './validation'
+import {
+  onlyErrors,
+  validateEmail,
+  validateFullName,
+  validatePassword,
+  validatePlace,
+} from './validation'
 
 export default function RegisterPage() {
   const { user, register } = useAuth()
@@ -15,6 +21,8 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [city, setCity] = useState('')
+  const [municipality, setMunicipality] = useState('')
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -29,6 +37,8 @@ export default function RegisterPage() {
       fullName: validateFullName(fullName),
       email: validateEmail(email),
       password: validatePassword(password),
+      city: validatePlace(city, 'Въведете град.'),
+      municipality: validatePlace(municipality, 'Въведете община.'),
     })
     setErrors(found)
     setFormError(null)
@@ -36,7 +46,13 @@ export default function RegisterPage() {
 
     setSubmitting(true)
     try {
-      await register(fullName.trim(), email.trim(), password)
+      await register({
+        fullName: fullName.trim(),
+        email: email.trim(),
+        password,
+        city: city.trim(),
+        municipality: municipality.trim(),
+      })
       navigate('/', { replace: true })
     } catch (error) {
       const { message, fields } = toFormError(error)
@@ -53,7 +69,7 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout>
-      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-8">
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-3">
         <FormError message={formError} />
         <Input
           label="Име и Фамилия:"
@@ -70,6 +86,21 @@ export default function RegisterPage() {
           onChange={(event) => setEmail(event.target.value)}
           error={errors.email}
         />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Input
+            label="Град:"
+            autoComplete="address-level2"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            error={errors.city}
+          />
+          <Input
+            label="Община:"
+            value={municipality}
+            onChange={(event) => setMunicipality(event.target.value)}
+            error={errors.municipality}
+          />
+        </div>
         <Input
           label="Парола:"
           type="password"
@@ -78,7 +109,7 @@ export default function RegisterPage() {
           onChange={(event) => setPassword(event.target.value)}
           error={errors.password}
         />
-        <div className="flex flex-col items-center gap-4">
+        <div className="mt-1 flex flex-col items-center gap-3">
           <Button type="submit" disabled={submitting}>
             Регистрация
           </Button>

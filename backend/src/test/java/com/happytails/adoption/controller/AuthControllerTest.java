@@ -34,11 +34,17 @@ class AuthControllerTest {
   @Autowired private PasswordEncoder passwordEncoder;
 
   private ResultActions register(String email, String password, String fullName) throws Exception {
+    return register(email, password, fullName, "София", "Столична");
+  }
+
+  private ResultActions register(
+      String email, String password, String fullName, String city, String municipality)
+      throws Exception {
     String body =
         """
-        {"email": "%s", "password": "%s", "fullName": "%s"}
+        {"email": "%s", "password": "%s", "fullName": "%s", "city": "%s", "municipality": "%s"}
         """
-            .formatted(email, password, fullName);
+            .formatted(email, password, fullName, city, municipality);
     return mockMvc.perform(
         post("/api/auth/register")
             .with(csrf())
@@ -49,17 +55,21 @@ class AuthControllerTest {
   @Test
   @DisplayName("Registration creates an applicant with a BCrypt password")
   void registerCreatesApplicant() throws Exception {
-    register("Maria@Example.com", "Parola123", "  Мария Иванова ")
+    register("Maria@Example.com", "Parola123", "  Мария Иванова ", " Пловдив ", " Пловдив ")
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").isNumber())
         .andExpect(jsonPath("$.email").value("maria@example.com"))
         .andExpect(jsonPath("$.fullName").value("Мария Иванова"))
         .andExpect(jsonPath("$.role").value("APPLICANT"))
+        .andExpect(jsonPath("$.city").value("Пловдив"))
+        .andExpect(jsonPath("$.municipality").value("Пловдив"))
         .andExpect(jsonPath("$.passwordHash").doesNotExist());
 
     User user = userRepository.findByEmail("maria@example.com").orElseThrow();
     assertEquals(Role.APPLICANT, user.getRole());
     assertTrue(user.isActive());
+    assertEquals("Пловдив", user.getCity());
+    assertEquals("Пловдив", user.getMunicipality());
     assertNotEquals("Parola123", user.getPasswordHash());
     assertTrue(passwordEncoder.matches("Parola123", user.getPasswordHash()));
   }
@@ -84,6 +94,16 @@ class AuthControllerTest {
         .andExpect(jsonPath("$.details", hasItem(startsWith("email:"))))
         .andExpect(jsonPath("$.details", hasItem(startsWith("password:"))))
         .andExpect(jsonPath("$.details", hasItem(startsWith("fullName:"))));
+  }
+
+  @Test
+  @DisplayName("City and municipality are required at registration")
+  void cityAndMunicipalityAreRequired() throws Exception {
+    register("maria@example.com", "Parola123", "Мария Иванова", " ", "")
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+        .andExpect(jsonPath("$.details", hasItem(startsWith("city:"))))
+        .andExpect(jsonPath("$.details", hasItem(startsWith("municipality:"))));
   }
 
   @Test

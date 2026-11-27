@@ -16,6 +16,13 @@
   --color-leaf: #3fa585;
   --color-danger: #b82149;
 
+  /* Colors and font from the Figma home page */
+  --font-display: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --color-deep: #013740;
+  --color-paper: #f3f3f3;
+  --color-peach: #f0a56c;
+  --color-teal: #269f91;
+
   --radius-pill: 54px;
   --shadow-soft: 4px 4px 4px 0 rgb(0 0 0 / 0.25);
 }
