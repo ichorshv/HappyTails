@@ -140,4 +140,8 @@ public class Animal {
   public Instant getCreatedAt() {
     return createdAt;
   }
+
+  public void changeStatus(AnimalStatus newStatus) {
+    this.status = newStatus;
+  }
 }
