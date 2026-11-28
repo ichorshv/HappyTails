@@ -5,8 +5,8 @@ import static org.mockito.Mockito.*;
 
 import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.enums.ApplicationStatus;
+import com.happytails.adoption.exception.ApiException;
 import com.happytails.adoption.repository.ApplicationRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ class StatusTransitionServiceTest {
     when(applicationRepository.findById(1L)).thenReturn(Optional.of(application));
 
     assertThrows(
-        IllegalArgumentException.class,
+        ApiException.class,
         () -> statusTransitionService.changeStatus(1L, ApplicationStatus.APPROVED));
 
     assertEquals(ApplicationStatus.SUBMITTED, application.getStatus());
@@ -57,7 +57,7 @@ class StatusTransitionServiceTest {
     when(applicationRepository.findById(99L)).thenReturn(Optional.empty());
 
     assertThrows(
-        EntityNotFoundException.class,
+        ApiException.class,
         () -> statusTransitionService.changeStatus(99L, ApplicationStatus.WAITING));
 
     verify(applicationRepository, never()).save(any(Application.class));
