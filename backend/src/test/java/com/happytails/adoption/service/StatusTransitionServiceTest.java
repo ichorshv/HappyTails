@@ -3,24 +3,39 @@ package com.happytails.adoption.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.happytails.adoption.entity.Animal;
 import com.happytails.adoption.entity.Application;
 import com.happytails.adoption.enums.ApplicationStatus;
+import com.happytails.adoption.repository.AnimalRepository;
 import com.happytails.adoption.repository.ApplicationRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 class StatusTransitionServiceTest {
 
   private ApplicationRepository applicationRepository;
   private StatusTransitionService statusTransitionService;
+  private ApplicationEventPublisher eventPublisher;
+  private AnimalRepository animalRepository;
+  private EntityManager entityManager;
 
   @BeforeEach
   void setUp() {
     applicationRepository = mock(ApplicationRepository.class);
-    statusTransitionService = new StatusTransitionService(applicationRepository);
+    animalRepository = mock(AnimalRepository.class);
+    entityManager = mock(EntityManager.class);
+    eventPublisher = mock(ApplicationEventPublisher.class);
+
+    when(animalRepository.findByIdForUpdate(5L)).thenReturn(Optional.of(mock(Animal.class)));
+
+    statusTransitionService =
+        new StatusTransitionService(
+            applicationRepository, animalRepository, entityManager, eventPublisher);
   }
 
   @Test
@@ -35,6 +50,12 @@ class StatusTransitionServiceTest {
 
     assertEquals(ApplicationStatus.WAITING, result.getStatus());
     verify(applicationRepository).save(application);
+    verify(eventPublisher)
+        .publishEvent(
+            new ApplicationStatusChanged(
+                1L, 5L, ApplicationStatus.SUBMITTED, ApplicationStatus.WAITING));
+    verify(animalRepository).findByIdForUpdate(5L);
+    verify(entityManager).refresh(application);
   }
 
   @Test
@@ -50,6 +71,7 @@ class StatusTransitionServiceTest {
     assertEquals(ApplicationStatus.SUBMITTED, application.getStatus());
 
     verify(applicationRepository, never()).save(any(Application.class));
+    verifyNoInteractions(eventPublisher);
   }
 
   @Test
@@ -61,6 +83,8 @@ class StatusTransitionServiceTest {
         () -> statusTransitionService.changeStatus(99L, ApplicationStatus.WAITING));
 
     verify(applicationRepository, never()).save(any(Application.class));
+    verifyNoInteractions(eventPublisher);
+    verifyNoInteractions(animalRepository, entityManager);
   }
 
   private Application createApplication() {
