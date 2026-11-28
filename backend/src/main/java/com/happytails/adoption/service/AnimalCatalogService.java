@@ -3,7 +3,10 @@ package com.happytails.adoption.service;
 import com.happytails.adoption.dto.AnimalSummaryResponse;
 import com.happytails.adoption.dto.PageResponse;
 import com.happytails.adoption.entity.Animal;
+import com.happytails.adoption.enums.AgeGroup;
+import com.happytails.adoption.enums.AnimalSize;
 import com.happytails.adoption.enums.AnimalStatus;
+import com.happytails.adoption.enums.Species;
 import com.happytails.adoption.mapper.AnimalMapper;
 import com.happytails.adoption.repository.AnimalRepository;
 import org.springframework.data.domain.Page;
@@ -29,10 +32,19 @@ public class AnimalCatalogService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<AnimalSummaryResponse> findAvailable() {
+  public PageResponse<AnimalSummaryResponse> findAvailable(
+      Species species, AgeGroup age, AnimalSize size, int page) {
+    int minAgeMonths = age == null ? 0 : age.getMinMonths();
+    int maxAgeMonths = age == null ? Integer.MAX_VALUE : age.getMaxMonths();
+
     Page<Animal> animals =
-        animalRepository.findByStatus(
-            AnimalStatus.AVAILABLE, PageRequest.of(0, PAGE_SIZE, NEWEST_FIRST));
+        animalRepository.findCatalog(
+            AnimalStatus.AVAILABLE,
+            species,
+            size,
+            minAgeMonths,
+            maxAgeMonths,
+            PageRequest.of(page, PAGE_SIZE, NEWEST_FIRST));
 
     return new PageResponse<>(
         animals.getContent().stream().map(animalMapper::toSummary).toList(),

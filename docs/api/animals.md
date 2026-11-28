@@ -1,6 +1,6 @@
 # API – Animals and Catalog (Member 2)
 
-Errors use the common format described in `docs/api/applications.md` (`status`, `code`, `message`, `details`). Error codes of this module start with `ANIMAL_`.
+Errors use the common format described in `docs/api/applications.md` (`status`, `code`, `message`, `details`). Error codes of this area start with `ANIMAL_`.
 
 ## Values
 
@@ -14,7 +14,7 @@ Errors use the common format described in `docs/api/applications.md` (`status`, 
 
 The frontend translates these codes into Bulgarian labels.
 
-A new animal is always `DRAFT`. It becomes `AVAILABLE` when staff publish it. `RESERVED` and `ADOPTED` are set only by the queue module (Member 4) through `AnimalStatusService` – there is no REST endpoint for them.
+A new animal is always `DRAFT`. It becomes `AVAILABLE` when staff publish it. `RESERVED` and `ADOPTED` are set only by the queue service (Member 4) through `AnimalStatusService` – there is no REST endpoint for them.
 
 ## 1. Catalog
 
@@ -22,7 +22,7 @@ A new animal is always `DRAFT`. It becomes `AVAILABLE` when staff publish it. `R
 
 Returns only animals with status `AVAILABLE`, newest first. All filters are optional and can be combined. Pages start at `0` and always have 12 animals (the page size is fixed, because `size` is the animal size filter).
 
-The filters and the `page` parameter are added in #23. Until then the endpoint returns the first page of all available animals.
+
 
 ### Response `200 OK`
 
@@ -178,9 +178,9 @@ No request body.
 | `404 Not Found` | The animal does not exist | `ANIMAL_NOT_FOUND` |
 | `409 Conflict` | The animal is not a draft | `ANIMAL_NOT_DRAFT` |
 
-## Interfaces for other modules
+## Interfaces for other areas
 
-These are Java interfaces in the package `animals.api`, not REST endpoints.
+These are Java interfaces in the package service, not REST endpoints. The enums are in enums.
 
 - `AnimalQueryService` – returns an animal's id, name, status and requirements, and whether it is available for adoption. Used by Applications (Member 3, requirements rule), Queue (Member 4) and Walks (Member 5).
 - `AnimalStatusService` – `markReserved(animalId)`, `markAdopted(animalId)`, `markAvailable(animalId)` (when an approved adoption falls through). Used only by Queue (Member 4).
