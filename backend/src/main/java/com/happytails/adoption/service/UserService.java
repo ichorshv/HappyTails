@@ -41,10 +41,7 @@ public class UserService {
   @Transactional
   public UserResponse registerApplicant(RegisterRequest request) {
     String email = normalizeEmail(request.email());
-    if (request.password().getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES) {
-      throw new ApiException(
-          HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Паролата е твърде дълга.");
-    }
+    checkPasswordLength(request.password());
     if (userRepository.existsByEmail(email)) {
       throw emailTaken();
     }
@@ -104,6 +101,13 @@ public class UserService {
     return new AuthUser(user.getId(), user.getEmail(), user.getRole());
   }
 
+  static void checkPasswordLength(String password) {
+    if (password.getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES) {
+      throw new ApiException(
+          HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Паролата е твърде дълга.");
+    }
+  }
+
   public static String normalizeEmail(String email) {
     return email.strip().toLowerCase(Locale.ROOT);
   }
@@ -112,7 +116,7 @@ public class UserService {
     return new ApiException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Не сте влезли в профила си.");
   }
 
-  private static ApiException emailTaken() {
+  static ApiException emailTaken() {
     return new ApiException(
         HttpStatus.CONFLICT, "AUTH_EMAIL_TAKEN", "Вече има профил с този имейл.");
   }
