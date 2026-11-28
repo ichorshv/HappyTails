@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import authRoutes from '../features/auth/routes'
+import walkRoutes from '../features/walks/routes'
 import HomePage from './HomePage'
 import SiteLayout from './SiteLayout'
 
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
     ],
   },
   ...authRoutes,
+  ...walkRoutes,
 ])
 
 export default router
